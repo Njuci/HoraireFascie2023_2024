@@ -12,3 +12,5 @@ from django.conf import settings
 import jwt
 
 
+def maiwn():
+    return{"message":"Tout haut"}
