@@ -11,16 +11,22 @@ class MyUser(AbstractUser):
            ('cp', 'Chef de prom'),
            ('enseignant', 'Enseignant'),
        )
+    username=models.CharField(max_length=50,unique=True,blank=True)
+    email=models.EmailField(unique=True)
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS=['email','password','full_name','user_type']
+    REQUIRED_FIELDS=['password','first_name','last_name','user_type']
     groups = models.ManyToManyField(Group, related_name='myuser_set', blank=True)
     user_permissions = models.ManyToManyField(
         Permission, related_name='myuser_set', blank=True
     )
     def __str__(self):
         return self.email
-    
+    def save(self, *args, **kwargs):
+        
+        if not self.username:
+            self.username = self.email  # or any default value like 'default_username'
+        super().save(*args, **kwargs)
 
     def has_perm(self,perms):
         return True
@@ -32,17 +38,17 @@ class MyUser(AbstractUser):
     
 #commentaire
 class Enseignant(models.Model):
-    id_user=models.ForeignKey(MyUser,on_delete=models.CASCADE,unique=True)    
+    id_user=models.OneToOneField(MyUser,on_delete=models.CASCADE)    
     niveau_ens=models.CharField(max_length=10,blank=True)
     statut_choice=(('permanent','Permanant'),('visiteur','Visiteur'))
 
 class Chef_Promotion(models.Model):
-    id_user=models.ForeignKey(MyUser,on_delete=models.CASCADE,unique=True)
+    id_user=models.OneToOneField(MyUser,on_delete=models.CASCADE,unique=True)
     id_promotion=models.ForeignKey(Promotion,on_delete=models.CASCADE)
     id_anacad=models.ForeignKey(Anacad,on_delete=models.CASCADE)
     
 class Encadreur_faculte(models.Model):
-    id_ens=models.ForeignKey(Enseignant,on_delete=models.CASCADE,unique=True)
+    id_ens=models.ForeignKey(Enseignant,on_delete=models.CASCADE)
     id_faculte=models.ForeignKey(Faculte,on_delete=models.CASCADE)
     id_anacad=models.ForeignKey(Anacad,on_delete=models.CASCADE)
     

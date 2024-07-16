@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-38kvh2xgy+7pa28y4s1#65=3a^pb&fu6ayl^n@l662%8x%3^(p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'djoser',
+    'drf_yasg',
     'User',
       
     'corsheaders',
@@ -64,7 +65,7 @@ MIDDLEWARE = [
     
     
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
+#
 ]
 
 ROOT_URLCONF = 'HoraireFascie2023_2024.urls'
@@ -90,7 +91,7 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -103,6 +104,21 @@ DATABASES = {
 }
 
 
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'horadb',  # Remplacez par le nom de votre base de données
+        'USER': 'horadb_owner',  # Remplacez par le nom d'utilisateur
+        'PASSWORD': 'zOEQdT16hpyF',  # Remplacez par le mot de passe
+        'HOST': 'ep-flat-star-a537v3dt.us-east-2.aws.neon.tech',  # Remplacez par l'hôte
+        'PORT': 5432,  # Laissez vide pour utiliser le port par défaut (5432)
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+        'DISABLE_SERVER_SIDE_CURSORS': True,
+    }
+}
 
 
 
@@ -168,7 +184,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     
 }
-
+we='postgresql://horadb_owner:zOEQdT16hpyF@ep-flat-star-a537v3dt.us-east-2.aws.neon.tech/horadb?sslmode=require'
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 

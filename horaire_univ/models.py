@@ -39,6 +39,7 @@ class Unite_Ens(models.Model):
 class Elenent_Const(models.Model):
     id_ue=models.ForeignKey(Unite_Ens,on_delete=models.CASCADE)
     denom_ue=models.CharField(max_length=70)
+    niveau_ue=models.CharField(max_length=8)
  
 class Anacad(models.Model):
     denom_anacad=models.CharField(max_length=9,unique=True,blank=True)
@@ -49,13 +50,33 @@ class Partie_ec(models.Model):
     #id_enseignant
     id_enseignant=models.ForeignKey('User.Enseignant',on_delete=models.CASCADE)#pour eviter l'erreir d'importation circulaire 
     #partie_ec choice
-    partie_choice=(('tp','Travail Pratique'),('CMI','Théorie'))
-    def save(self, *args, **kwargs):
-        Enseignant = apps.get_model('User', 'Enseignant')  # Dynamically retrieve the Enseignant model
-        # You can now use the Enseignant model as needed, for example, to validate or modify data before saving.
-        super().save(*args, **kwargs)
+    partie_choice=(('tp','Travail Pratique'),('cmi','Cours magistral'))
+    partie=models.CharField(max_length=3,choices=partie_choice)
+    class Meta:
+        unique_together=(('id_ec','partie','id_anacad'))#pour qu'un partie ne soit assigner une seul fois durant une année
+        
+class Programme_ec(models.Model):
+    id_partie_ec=models.OneToOneField(Partie_ec,on_delete=models.CASCADE)#pour eviter l'erreur de duplication des programmes des partie_ec
+    date_debut=models.DateField()
+    date_fin=models.DateField()
+class Disponibilite(models.Model):
+    id_enseignant=models.ForeignKey('User.Enseignant',on_delete=models.CASCADE)
+    id_partie_ec=models.ForeignKey(Partie_ec,on_delete=models.CASCADE)
+    liste_jours=models.TextField()
+     
+    def set_nombres(self, liste):
+        self.liste_jours = json.dumps(liste)
+
+    def get_nombres(self):
+        return json.loads(self.liste_jours)
     
     class Meta:
-        unique_together=('')
-        
-        
+        unique_together=(('id_enseignant','id_partie_ec'))
+class Horaire(models.Model):
+    id_partie_ec=models.ForeignKey(Partie_ec,on_delete=models.CASCADE)
+    date=models.DateField()
+    partie_journ_choice=(('matin','Matin'),('soir','Soir'))
+    partie_journ=models.CharField(max_length=5,choices=partie_journ_choice)
+    
+    class Meta:
+        unique_together=(('date','partie_journ')) #qu'une promotion n'a pas deux partie_ec dans la meme date et la meme partie de la journee
