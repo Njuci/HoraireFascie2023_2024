@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('schedule/',include('horaire_univ.urls')), 
     path('user/',include('User.urls')),
+    path('dispo/',include('dispo_app.urls')),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     
 ]

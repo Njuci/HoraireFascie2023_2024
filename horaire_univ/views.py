@@ -1,11 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Domaine,Faculte,Filiere,Mention,Promotion,Unite_Ens,Elenent_Const,Partie_ec,Programme_ec,Disponibilite,Horaire
+from .models import Domaine,Faculte,Filiere,Mention,Promotion,Unite_Ens,Elenent_Const,Partie_ec,Anacad
 
 
-from .serializers import Domaine_serial,Faculte_serial,Filiere_serial,Mention_serial,Promotion_serial,Unite_Ens_serial,Anacad_serial,Elenent_Const_serial,Partie_ec_serial,Programme_ec_serial,Disponibilite_serial,Horaire_serial
-
+from .serializers import (Domaine_serial,Faculte_serial,Filiere_serial,Mention_serial,Promotion_serial,Unite_Ens_serial,
+                          Anacad_serial,Elenent_Const_serial,Partie_ec_serial)
 class DomaineView(APIView):
     def get(self,request):
         domaine=Domaine.objects.all()
@@ -149,3 +149,127 @@ class PromotionView(APIView):
         promotion=Promotion.objects.get(id=id)
         promotion.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+#unite_ens
+
+class Unite_EnsView(APIView):
+    def get(self,request):
+        unite_ens=Unite_Ens.objects.all()
+        serializer=Unite_Ens_serial(unite_ens,many=True)
+        return Response(serializer.data)
+    def post(self,request):
+        serializer=Unite_Ens_serial(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def put(self,request):
+        id=request.data['id']
+        unite_ens=Unite_Ens.objects.get(id=id)
+        serializer=Unite_Ens_serial(unite_ens,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def delete(self,request):
+        id=request.data['id']
+        unite_ens=Unite_Ens.objects.get(id=id)
+        unite_ens.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+#anacad
+class AnacadView(APIView):
+    def get(self,request):
+        anacad=Anacad.objects.all()
+        serializer=Anacad_serial(anacad,many=True)
+        return Response(serializer.data)
+    def post(self,request):
+        serializer=Anacad_serial(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def put(self,request):
+        id=request.data['id']
+        anacad=Anacad.objects.get(id=id)
+        serializer=Anacad_serial(anacad,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def delete(self,request):
+        id=request.data['id']
+        anacad=Anacad.objects.get(id=id)
+        anacad.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+#elenent_const
+class Elenent_ConstView(APIView):
+    def get(self,request):
+        elenent_const=Elenent_Const.objects.all()
+        serializer=Elenent_Const_serial(elenent_const,many=True)
+        return Response(serializer.data)
+    def post(self,request):
+        serializer=Elenent_Const_serial(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def put(self,request):
+        id=request.data['id']
+        elenent_const=Elenent_Const.objects.get(id=id)
+        serializer=Elenent_Const_serial(elenent_const,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def delete(self,request):
+        id=request.data['id']
+        elenent_const=Elenent_Const.objects.get(id=id)
+        elenent_const.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+#partie_ec
+class Partie_ecView(APIView):
+    def get(self,request):
+        partie_ec=Partie_ec.objects.all()
+        serializer=Partie_ec_serial(partie_ec,many=True)
+        return Response(serializer.data)
+    def post(self,request):
+        serializer=Partie_ec_serial(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def put(self,request):
+        id=request.data['id']
+        partie_ec=Partie_ec.objects.get(id=id)
+        serializer=Partie_ec_serial(partie_ec,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    def delete(self,request):
+        id=request.data['id']
+        partie_ec=Partie_ec.objects.get(id=id)
+        partie_ec.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

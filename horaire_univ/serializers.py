@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer,SerializerMethodField
 from .models import (Domaine,Faculte,Filiere,Mention,Promotion,Unite_Ens,Anacad,Elenent_Const
-                     ,Partie_ec,Programme_ec,Disponibilite,Horaire)
+                     ,Partie_ec)
 
 
 
@@ -54,21 +54,6 @@ class Elenent_Const_serial(ModelSerializer):
 class Partie_ec_serial(ModelSerializer):
     class Meta:
         model=Partie_ec
-        fields='__all__'
-        
-class Programme_ec_serial(ModelSerializer):
-    class Meta:
-        model=Programme_ec
-        fields='__all__'
-        
-class Disponibilite_serial(ModelSerializer):
-    class Meta:
-        model=Disponibilite
-        fields='__all__'
-
-class Horaire_serial(ModelSerializer):
-    class Meta:
-        model=Horaire
         fields='__all__'
         
 

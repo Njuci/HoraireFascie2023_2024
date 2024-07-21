@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'djoser',
     'drf_yasg',
     'User',
-      
+      'dispo_app',
     'corsheaders',
     'horaire_univ',
     
@@ -91,7 +91,9 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
 """
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -195,7 +197,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
