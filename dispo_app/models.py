@@ -4,7 +4,6 @@ from horaire_univ.models import *
 # Create your models here.
 
 class Disponibilite(models.Model):
-    id_enseignant=models.ForeignKey('User.Enseignant',on_delete=models.CASCADE,default=1)
     id_partie_ec=models.ForeignKey(Partie_ec,on_delete=models.CASCADE)
     liste_jours=models.TextField()
      
@@ -14,8 +13,7 @@ class Disponibilite(models.Model):
     def get_nombres(self):
         return json.loads(self.liste_jours)
     
-    class Meta:
-        unique_together=(('id_enseignant','id_partie_ec'))
+    
 class Horaire(models.Model):
     id_partie_ec=models.ForeignKey(Partie_ec,on_delete=models.CASCADE)
     date=models.DateField()

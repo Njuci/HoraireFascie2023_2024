@@ -24,3 +24,7 @@ class Semestre_serial(ModelSerializer):
         fields='__all__'
         
         
+class DisponibiliteSerializer(ModelSerializer):
+    class Meta:
+        model=Disponibilite
+        fields='__all__'      

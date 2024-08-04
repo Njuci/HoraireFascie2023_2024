@@ -8,15 +8,27 @@ from .serializers import (Domaine_serial,Faculte_serial,Filiere_serial,Mention_s
                           Anacad_serial,Elenent_Const_serial,Partie_ec_serial)
 class DomaineView(APIView):
     def get(self,request):
+        """
+        Pour faire un get des domaines
+                        [
+                    {
+                        "id": 1,
+                        "nom_dom": "Sciences et Technologie"
+                    }
+                ]
+        """
         domaine=Domaine.objects.all()
         serializer=Domaine_serial(domaine,many=True)
         return Response(serializer.data)
     def post(self,request):
+        
         """ 
-        post method for domaine
-        {"nom_dom":"Sciences et Technologies"}
+        Pour faire un post d'un domaine
+        {"nom_dom": "Sciences et Technologie"}
+        
         
         """
+       
         serializer=Domaine_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -24,6 +36,13 @@ class DomaineView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """
+        Pour faiee un Put
+                    {
+                        "id": 1,
+                        "nom_dom": "Sciences et Technologie"
+                    }
+        """
         id=request.data['id']
         domaine=Domaine.objects.get(id=id)
         serializer=Domaine_serial(domaine,data=request.data)
@@ -33,17 +52,37 @@ class DomaineView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """ 
+        pour supprimer un domaine
+        {"id":1}
+        """
         id=request.data['id']
         domaine=Domaine.objects.get(id=id)
-        domaine.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if domaine.delete():
+            return Response({"messafe":"domaine supprimé"},status=status.HTTP_204_NO_CONTENT)
+        return Response({"message":"domaine non supprimé"},status=status.HTTP_400_BAD_REQUEST)
 #faculte
 class FaculteView(APIView):
     def get(self,request):
+        """
+                                        
+                        [
+                            {
+                                "id": 1,
+                                "nom_fac": "Faculte des sciences informatiques",
+                                "id_dom": 1
+                            }
+                        ]
+                                
+        
+        """
         faculte=Faculte.objects.all()
         serializer=Faculte_serial(faculte,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """ {"nom_fac": "Faculte des sciences informatiques",
+        "id_dom": 1
+            }"""
         serializer=Faculte_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -51,6 +90,11 @@ class FaculteView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """
+                             {   "id": 1,
+                                "nom_fac": "Faculte des sciences informatiques",
+                                "id_dom": 1
+                            }        """
         id=request.data['id']
         faculte=Faculte.objects.get(id=id)
         serializer=Faculte_serial(faculte,data=request.data)
@@ -60,6 +104,7 @@ class FaculteView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """{"id":1}"""
         id=request.data['id']
         faculte=Faculte.objects.get(id=id)
         faculte.delete()
@@ -67,10 +112,14 @@ class FaculteView(APIView):
 #filiere
 class FiliereView(APIView):
     def get(self,request):
+        """ 
+             [{"id": 1,"nom_fil": "Informatique","id_fac": 1}]  """
         filiere=Filiere.objects.all()
         serializer=Filiere_serial(filiere,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """{ "nom_fil": "Informatique",
+                                "id_fac": 1}"""
         serializer=Filiere_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -78,6 +127,7 @@ class FiliereView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """{"id": 1,"nom_fil": "Informatique","id_fac": 1}"""
         id=request.data['id']
         filiere=Filiere.objects.get(id=id)
         serializer=Filiere_serial(filiere,data=request.data)
@@ -87,6 +137,8 @@ class FiliereView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """{"id":1}"""
+        
         id=request.data['id']
         filiere=Filiere.objects.get(id=id)
         filiere.delete()
@@ -95,10 +147,18 @@ class FiliereView(APIView):
 #mention
 class MentionView(APIView):
     def get(self,request):
+        """ [
+    {
+        "id": 1,
+        "nom_mention": "Genie Logiciel",
+        "id_fil": 1
+    }
+]"""
         mention=Mention.objects.all()
         serializer=Mention_serial(mention,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """ {"nom_mention": "Genie Logiciel", "id_fil": 1}"""
         serializer=Mention_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -106,6 +166,10 @@ class MentionView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """
+        { "id": 1,
+        "nom_mention": "Genie Logiciel",
+        "id_fil": 1} """
         id=request.data['id']
         mention=Mention.objects.get(id=id)
         serializer=Mention_serial(mention,data=request.data)
@@ -115,6 +179,7 @@ class MentionView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """ {"id":1}"""
         id=request.data['id']
         mention=Mention.objects.get(id=id)
         if mention:
@@ -125,10 +190,22 @@ class MentionView(APIView):
 #promotion
 class PromotionView(APIView):
     def get(self,request):
+        """
+        [
+    {
+        "id": 1,
+        "nom_prom": "Bac 1",
+        "id_mention": 1
+    }
+]
+            """
+       
         promotion=Promotion.objects.all()
         serializer=Promotion_serial(promotion,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """{   "nom_prom": "Bac 1",
+        "id_mention": 1} """
         serializer=Promotion_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -136,6 +213,7 @@ class PromotionView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """{ "id": 1,"nom_prom": "Bac 1","id_mention": 1}"""
         id=request.data['id']
         promotion=Promotion.objects.get(id=id)
         serializer=Promotion_serial(promotion,data=request.data)
@@ -145,6 +223,7 @@ class PromotionView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """{"id":1}"""
         id=request.data['id']
         promotion=Promotion.objects.get(id=id)
         promotion.delete()
@@ -153,10 +232,61 @@ class PromotionView(APIView):
 
 class Unite_EnsView(APIView):
     def get(self,request):
+        """
+                            [
+                        {
+                            "id": 1,
+                            "code_ue": "INI001",
+                            "denom_ue": "Initiation à la programmation",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                        },
+                        {
+                            "id": 2,
+                            "code_ue": "Inf203",
+                            "denom_ue": "Modelisation",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                        },
+                        {
+                            "id": 3,
+                            "code_ue": "Inf2034",
+                            "denom_ue": "Modelisation",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                        },
+                        {
+                            "id": 4,
+                            "code_ue": "inf304",
+                            "denom_ue": "Language de programmation mobil",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                        },
+                        {
+                            "id": 5,
+                            "code_ue": "inf245",
+                            "denom_ue": "introduction a la cryptologie",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                        }
+                    ]  
+                    
+                    
+                    semstre: premier ou second
+                    """
         unite_ens=Unite_Ens.objects.all()
         serializer=Unite_Ens_serial(unite_ens,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """ {
+                            "code_ue": "inf245",
+                            "denom_ue": "introduction a la cryptologie",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                            }
+                            
+            """
+        
         serializer=Unite_Ens_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -164,6 +294,13 @@ class Unite_EnsView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """{
+                            "id": 5,
+                            "code_ue": "inf245",
+                            "denom_ue": "introduction a la cryptologie",
+                            "semstre": "premier",
+                            "id_promotion": 1
+                        }"""
         id=request.data['id']
         unite_ens=Unite_Ens.objects.get(id=id)
         serializer=Unite_Ens_serial(unite_ens,data=request.data)
@@ -173,6 +310,7 @@ class Unite_EnsView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """{"id":1} """
         id=request.data['id']
         unite_ens=Unite_Ens.objects.get(id=id)
         unite_ens.delete()
@@ -180,10 +318,25 @@ class Unite_EnsView(APIView):
 #anacad
 class AnacadView(APIView):
     def get(self,request):
+        """ 
+        pour faire un get
+            [
+            {
+                "id": 1,
+                "denom_anacad": "2023-2024"
+            },
+            {
+                "id": 2,
+                "denom_anacad": "2024-2025"
+            }]        
+        
+        """
+        
         anacad=Anacad.objects.all()
         serializer=Anacad_serial(anacad,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """{"denom_anacad": "2023-2024"}"""
         serializer=Anacad_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -191,6 +344,11 @@ class AnacadView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """{
+            "id": 1,
+            "denom_anacad": "2023-2024"
+        }"""
+        
         id=request.data['id']
         anacad=Anacad.objects.get(id=id)
         serializer=Anacad_serial(anacad,data=request.data)
@@ -208,10 +366,50 @@ class AnacadView(APIView):
 #elenent_const
 class Elenent_ConstView(APIView):
     def get(self,request):
+        """
+                [
+            {
+                "id": 1,
+                "denom_ec": "Language de programmation mobil",
+                "niveau_ec": "1",
+                "id_ue": 4
+            },
+            {
+                "id": 2,
+                "denom_ec": "UML2",
+                "niveau_ec": "2",
+                "id_ue": 3
+            },
+            {
+                "id": 3,
+                "denom_ec": "TBD",
+                "niveau_ec": "2",
+                "id_ue": 3
+            },
+            {
+                "id": 4,
+                "denom_ec": "Langage  Kotkin",
+                "niveau_ec": "2",
+                "id_ue": 4
+            },
+            {
+                "id": 5,
+                "denom_ec": "Python",
+                "niveau_ec": "2",
+                "id_ue": 1
+            }
+        ]
+
+ """
         elenent_const=Elenent_Const.objects.all()
         serializer=Elenent_Const_serial(elenent_const,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """ {
+            "denom_ec": "Python",
+            "niveau_ec": "2",
+            "id_ue": 1
+        }"""
         serializer=Elenent_Const_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -219,6 +417,12 @@ class Elenent_ConstView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """{
+            "id": 5,
+            "denom_ec": "Python",
+            "niveau_ec": "2",
+            "id_ue": 1
+        }"""
         id=request.data['id']
         elenent_const=Elenent_Const.objects.get(id=id)
         serializer=Elenent_Const_serial(elenent_const,data=request.data)
@@ -228,6 +432,7 @@ class Elenent_ConstView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """{"id":1}"""
         id=request.data['id']
         elenent_const=Elenent_Const.objects.get(id=id)
         elenent_const.delete()
@@ -235,10 +440,99 @@ class Elenent_ConstView(APIView):
 #partie_ec
 class Partie_ecView(APIView):
     def get(self,request):
+        """[
+    {
+        "id": 1,
+        "volume_horaire": 45,
+        "partie_ec_choice": "cmi",
+        "id_ec": 1,
+        "id_anacad": 1,
+        "id_enseignant": 1
+    },
+    {
+        "id": 2,
+        "volume_horaire": 1,
+        "partie_ec_choice": "cmi",
+        "id_ec": 2,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    },
+    {
+        "id": 3,
+        "volume_horaire": 1,
+        "partie_ec_choice": "tp",
+        "id_ec": 1,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    },
+    {
+        "id": 4,
+        "volume_horaire": 1,
+        "partie_ec_choice": "tp",
+        "id_ec": 2,
+        "id_anacad": 1,
+        "id_enseignant": 1
+    },
+    {
+        "id": 5,
+        "volume_horaire": 1,
+        "partie_ec_choice": "tp",
+        "id_ec": 3,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    },
+    {
+        "id": 6,
+        "volume_horaire": 1,
+        "partie_ec_choice": "cmi",
+        "id_ec": 3,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    },
+    {
+        "id": 7,
+        "volume_horaire": 1,
+        "partie_ec_choice": "cmi",
+        "id_ec": 4,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    },
+    {
+        "id": 8,
+        "volume_horaire": 1,
+        "partie_ec_choice": "tp",
+        "id_ec": 4,
+        "id_anacad": 1,
+        "id_enseignant": 1
+    },
+    {
+        "id": 10,
+        "volume_horaire": 1,
+        "partie_ec_choice": "cmi",
+        "id_ec": 5,
+        "id_anacad": 1,
+        "id_enseignant": 1
+    },
+    {
+        "id": 11,
+        "volume_horaire": 1,
+        "partie_ec_choice": "tp",
+        "id_ec": 5,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    }
+]"""
         partie_ec=Partie_ec.objects.all()
         serializer=Partie_ec_serial(partie_ec,many=True)
         return Response(serializer.data)
     def post(self,request):
+        """{
+            "volume_horaire": 1,
+            "partie_ec_choice": "tp",
+            "id_ec": 5,
+            "id_anacad": 1,
+            "id_enseignant": 2      }"""
+            
         serializer=Partie_ec_serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -246,6 +540,17 @@ class Partie_ecView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def put(self,request):
+        """{
+        "id": 11,
+        "volume_horaire": 1,
+        "partie_ec_choice": "tp",
+        "id_ec": 5,
+        "id_anacad": 1,
+        "id_enseignant": 2
+    } """
+        
+        
+
         id=request.data['id']
         partie_ec=Partie_ec.objects.get(id=id)
         serializer=Partie_ec_serial(partie_ec,data=request.data)
@@ -255,6 +560,7 @@ class Partie_ecView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
+        """{"id":1}"""
         id=request.data['id']
         partie_ec=Partie_ec.objects.get(id=id)
         partie_ec.delete()
