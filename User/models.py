@@ -15,11 +15,12 @@ class MyUser(AbstractUser):
     email=models.EmailField(unique=True)
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS=['password','first_name','last_name','user_type']
+    REQUIRED_FIELDS=['username','password','first_name','last_name','user_type']
     groups = models.ManyToManyField(Group, related_name='myuser_set', blank=True)
     user_permissions = models.ManyToManyField(
         Permission, related_name='myuser_set', blank=True
     )
+    
     def __str__(self):
         return self.email
     def save(self, *args, **kwargs):
@@ -39,8 +40,10 @@ class MyUser(AbstractUser):
 #commentaire
 class Enseignant(models.Model):
     id_user=models.OneToOneField(MyUser,on_delete=models.CASCADE)    
-    niveau_ens=models.CharField(max_length=10,blank=True)
+
+    niveau_ens=models.CharField(max_length=100,blank=True)
     statut_choice=(('permanent','Permanant'),('visiteur','Visiteur'))
+    statut=models.CharField(max_length=10,choices=statut_choice)
 
 class Chef_Promotion(models.Model):
     id_user=models.OneToOneField(MyUser,on_delete=models.CASCADE,unique=True)

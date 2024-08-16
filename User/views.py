@@ -72,7 +72,7 @@ class RegisterView_user(APIView):
         
         
         {" first_name":"Van dam","last_name":"Jean-claude","email":"njcuimec@gmail.com",
-            "password":"4355vvefeef","user_type":"admin","id":1} exemple
+            "password":"4355vvefeef","user_type":"enseignant", ""} exemple
             
             on peut ou ne pas mettre tous les champs
             
@@ -91,7 +91,21 @@ class RegisterView_user(APIView):
     
 class RegisterView_enseignant(APIView):
     def post(self,request):
-        """ register enseignant"""
+        """ {" first_name":"Van dam","last_name":"Jean-claude","email":"njcuimec@gmail.com",
+            "password":"4355vvefeef","user_type":"enseignant","niveau_ens":"assistnt","statut":""}"""
+        user={'first_name':request.data['first_name'],'last_name':request.data['last_name'],
+              'email':request.data['email'],'password':request.data['password'],'user_type':'enseignant'}
+        serial_user =Utilisateur_Serial(data=user)
+        
+        if serial_user.is_valid(raise_exception=True):
+             serial_user.save()
+        else:
+            return Response(serial_user.errors,status=status.HTTP_400_BAD_REQUEST)
+        id_user=MyUser.objects.get(email=request.data['email'])
+        enseignant={'id_user':id_user.id}
+        #lkeys and values of request.data - user
+        request.data.pop(i for i in user.keys())
+        enseignant.update(request.data)
         serializer=Enseignant_Serial(data=request.data)
         if serializer.is_valid(raise_exception=True):
              serializer.save()

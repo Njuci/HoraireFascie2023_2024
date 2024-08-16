@@ -65,20 +65,25 @@ class DomaineView(APIView):
 class FaculteView(APIView):
     def get(self,request):
         """
-                                        
-                        [
-                            {
-                                "id": 1,
-                                "nom_fac": "Faculte des sciences informatiques",
-                                "id_dom": 1
-                            }
-                        ]
-                                
+           [
+                                    {
+                                        "id": 1,
+                                        "nom_fac": "Faculté des sciences",
+                                        "id_dom": 1,
+                                        "nom_dom": "Sciences et technologies"
+                                    }
+                                    ]    
         
         """
         faculte=Faculte.objects.all()
         serializer=Faculte_serial(faculte,many=True)
-        return Response(serializer.data)
+        liste_fac=[]
+        for i in serializer.data:
+            domaine=Domaine.objects.get(id=i['id_dom'])
+            i['nom_dom']=domaine.nom_dom
+            liste_fac.append(i)
+            
+        return Response(liste_fac)
     def post(self,request):
         """ {"nom_fac": "Faculte des sciences informatiques",
         "id_dom": 1
@@ -116,7 +121,19 @@ class FiliereView(APIView):
              [{"id": 1,"nom_fil": "Informatique","id_fac": 1}]  """
         filiere=Filiere.objects.all()
         serializer=Filiere_serial(filiere,many=True)
-        return Response(serializer.data)
+        liste_filiere=[]
+        
+        for i in serializer.data:
+            fac=Faculte.objects.get(id=i['id_fac'])
+            fac_serial=Faculte_serial(fac)
+            domaine=Domaine.objects.get(id=fac_serial.data['id_dom'])
+            
+            i['nom_fac']=fac.nom_fac
+            i['nom_dom']=domaine.nom_dom
+            
+            liste_filiere.append(i)
+
+        return Response(liste_filiere,status=status.HTTP_200_OK)
     def post(self,request):
         """{ "nom_fil": "Informatique",
                                 "id_fac": 1}"""

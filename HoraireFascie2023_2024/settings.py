@@ -94,8 +94,9 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 
 
-
 """
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -123,7 +124,6 @@ DATABASES = {
         'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 }
-
 
 
 
@@ -208,3 +208,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL='User.MyUser'
