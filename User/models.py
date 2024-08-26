@@ -50,7 +50,7 @@ class Chef_Promotion(models.Model):
     id_promotion=models.ForeignKey(Promotion,on_delete=models.CASCADE)
     id_anacad=models.ForeignKey(Anacad,on_delete=models.CASCADE)
     
-class Encadreur_faculte(models.Model):
+class  Encadreur_faculte(models.Model):
     id_ens=models.ForeignKey(Enseignant,on_delete=models.CASCADE)
     id_faculte=models.ForeignKey(Faculte,on_delete=models.CASCADE)
     id_anacad=models.ForeignKey(Anacad,on_delete=models.CASCADE)

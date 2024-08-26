@@ -27,7 +27,7 @@ class Mention(models.Model):
 
 class Promotion(models.Model):
     id_mention=models.ForeignKey(Mention,on_delete=models.CASCADE)
-    nom_prom=models.CharField(max_length=70,unique=True,blank=True)
+    nom_prom=models.CharField(max_length=70,blank=True)
     def __str__(self) -> str:
         return f"{self.id_mention.nom_mention} {self.nom_prom.capitalize()}"
 class Unite_Ens(models.Model):

@@ -96,7 +96,6 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 """
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -124,6 +123,7 @@ DATABASES = {
         'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 }
+
 
 
 

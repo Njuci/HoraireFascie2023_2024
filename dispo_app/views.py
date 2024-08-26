@@ -13,6 +13,7 @@ from User.models import Enseignant
 #programme_ec
 class Programme_ecView(APIView):
     def get(self,request):
+        
         programme_ec=Programme_ec.objects.all()
         serializer=Programme_ec_serial(programme_ec,many=True)
         return Response(serializer.data)
@@ -108,7 +109,11 @@ class AjouterDateDisponibleView(APIView):
             )
 
             # Charger la liste des jours disponibles
+            
             jours_disponibles = disponibilite.get_nombres()
+            
+            
+            
 
             # Vérifier si la date et la partie de la journée sont déjà dans les disponibilités
             if any(dispo['date'] == date_libre.isoformat() and dispo['partie_journ'] == partie_journ for dispo in jours_disponibles):
@@ -127,3 +132,10 @@ class AjouterDateDisponibleView(APIView):
 
 
 
+class AjouterDateDisponibleView2(APIView):
+    def post(self, request):
+        id_partie_ec=request.data['id_partie_ec']
+        
+        
+        pass 
+        

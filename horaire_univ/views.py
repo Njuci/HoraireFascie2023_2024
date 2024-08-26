@@ -118,12 +118,21 @@ class FaculteView(APIView):
 class FiliereView(APIView):
     def get(self,request):
         """ 
-             [{"id": 1,"nom_fil": "Informatique","id_fac": 1}]  """
+            [
+                    {
+                        "id": 1,
+                        "nom_fil": "Informatique",
+                        "id_fac": 1,
+                        "nom_fac": "Faculte des sciences informatiques",
+                        "nom_dom": "Sciences et Technologie"
+                    }
+            ]   """
         filiere=Filiere.objects.all()
         serializer=Filiere_serial(filiere,many=True)
         liste_filiere=[]
         
         for i in serializer.data:
+            
             fac=Faculte.objects.get(id=i['id_fac'])
             fac_serial=Faculte_serial(fac)
             domaine=Domaine.objects.get(id=fac_serial.data['id_dom'])
@@ -168,12 +177,28 @@ class MentionView(APIView):
     {
         "id": 1,
         "nom_mention": "Genie Logiciel",
-        "id_fil": 1
-    }
-]"""
+        "id_fil": 1,
+        "nom_fac": "Faculte des sciences informatiques",
+        "nom_dom": "Sciences et Technologie",
+        "nom_fil": "Informatique"
+    }]
+        """
         mention=Mention.objects.all()
+        liste_mention=[]
         serializer=Mention_serial(mention,many=True)
-        return Response(serializer.data)
+        for i in serializer.data:
+            fil=Filiere.objects.get(id=i['id_fil'])
+            filserial=Filiere_serial(fil)
+            fac=Faculte.objects.get(id=filserial.data['id_fac'])
+            fac_serial=Faculte_serial(fac)
+            domaine=Domaine.objects.get(id=fac_serial.data['id_dom'])            
+            i['nom_fac']=fac.nom_fac
+            i['nom_dom']=domaine.nom_dom
+            i['nom_fil']=fil.nom_fil
+            liste_mention.append(i)
+        
+        
+        return Response(liste_mention,status=status.HTTP_200_OK)
     def post(self,request):
         """ {"nom_mention": "Genie Logiciel", "id_fil": 1}"""
         serializer=Mention_serial(data=request.data)
@@ -216,10 +241,23 @@ class PromotionView(APIView):
     }
 ]
             """
-       
+        liste_promotion=[]
         promotion=Promotion.objects.all()
         serializer=Promotion_serial(promotion,many=True)
-        return Response(serializer.data)
+        for i in serializer.data:
+            mention=Mention.objects.get(id=i['id_mention'])
+            mention_serial=Mention_serial(mention)
+            fil=Filiere.objects.get(id=mention_serial.data['id_fil'])
+            filserial=Filiere_serial(fil)
+            fac=Faculte.objects.get(id=filserial.data['id_fac'])
+            fac_serial=Faculte_serial(fac)
+            domaine=Domaine.objects.get(id=fac_serial.data['id_dom'])            
+            i['nom_fac']=fac.nom_fac
+            i['nom_dom']=domaine.nom_dom    
+            i['nom_fil']=fil.nom_fil
+            i['nom_mention']=mention.nom_mention
+            liste_promotion.append(i)
+        return Response(liste_promotion,status=status.HTTP_200_OK)
     def post(self,request):
         """{   "nom_prom": "Bac 1",
         "id_mention": 1} """
@@ -274,7 +312,7 @@ class Unite_EnsView(APIView):
                         },
                         {
                             "id": 4,
-                            "code_ue": "inf304",
+                                 "code_ue": "inf304",
                             "denom_ue": "Language de programmation mobil",
                             "semstre": "premier",
                             "id_promotion": 1
@@ -285,7 +323,7 @@ class Unite_EnsView(APIView):
                             "denom_ue": "introduction a la cryptologie",
                             "semstre": "premier",
                             "id_promotion": 1
-                        }
+                        }a
                     ]  
                     
                     
@@ -538,7 +576,7 @@ class Partie_ecView(APIView):
         "id_anacad": 1,
         "id_enseignant": 2
     }
-]"""
+]""" 
         partie_ec=Partie_ec.objects.all()
         serializer=Partie_ec_serial(partie_ec,many=True)
         return Response(serializer.data)

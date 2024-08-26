@@ -70,9 +70,7 @@ class RegisterView_user(APIView):
         """
         update user
         
-        
-        {" first_name":"Van dam","last_name":"Jean-claude","email":"njcuimec@gmail.com",
-            "password":"4355vvefeef","user_type":"enseignant", ""} exemple
+         exemple 
             
             on peut ou ne pas mettre tous les champs
             
@@ -91,7 +89,8 @@ class RegisterView_user(APIView):
     
 class RegisterView_enseignant(APIView):
     def post(self,request):
-        """ {" first_name":"Van dam","last_name":"Jean-claude","email":"njcuimec@gmail.com",
+        print(request.data)
+        """ {"first_name":"Van dam","last_name":"Jean-claude","email":"njcuimec@gmail.com",
             "password":"4355vvefeef","user_type":"enseignant","niveau_ens":"assistnt","statut":""}"""
         user={'first_name':request.data['first_name'],'last_name':request.data['last_name'],
               'email':request.data['email'],'password':request.data['password'],'user_type':'enseignant'}
@@ -104,32 +103,37 @@ class RegisterView_enseignant(APIView):
         id_user=MyUser.objects.get(email=request.data['email'])
         enseignant={'id_user':id_user.id}
         #lkeys and values of request.data - user
-        request.data.pop(i for i in user.keys())
-        enseignant.update(request.data)
-        serializer=Enseignant_Serial(data=request.data)
+        enseignant['niveau_ens']=request.data['niveau_ens']
+        enseignant['statut']=request.data['statut']
+        serializer=Enseignant_Serial(data=enseignant)
         if serializer.is_valid(raise_exception=True):
              serializer.save()
         else:
+            id_user.delete()
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
-    def get(self,request):
-        """enseignant and users type enseignant"""
-        enseignant_users_list=[]
-        user=MyUser.objects.filter(user_type='enseignant')
-        for i in user:
-            ensignant=Enseignant.objects.get(id_user=i)
-            if ensignant:
-                # melanger les deux dictionnaires en distinguant id_enseignant et id_user
-                melange={}
-                melange.update(ensignant.__dict__)
-                melange.update(i.__dict__)
-                melange.pop('id')
-                melange['id_enseignant']=ensignant.id
-                melange['id_user']=i.id 
-                enseignant_users_list.append(melange)
     
-        serializer=enseignant_users_list
-        return Response(serializer,status=status.HTTP_200_OK)
+    def get(self, request):
+        """enseignant and users type enseignant"""
+        enseignant_users_list = []
+        users = MyUser.objects.filter(user_type='enseignant')
+        
+        for user in users:
+            serial_user = Utilisateur_Serial(user)
+            if Enseignant.objects.filter(id_user=serial_user.data['id']).exists():
+                enseignant = Enseignant.objects.get(id_user=serial_user.data['id'])
+                enseignant_serial = Enseignant_Serial(enseignant).data
+                user_serial = serial_user.data
+                
+                # Mélanger les deux dictionnaires en distinguant id_enseignant et id_user
+                melange = {**enseignant_serial, **user_serial}
+                melange['id_enseignant'] = enseignant.id
+                melange['id_user'] = user.id
+                #pop id in melange
+                melange.pop('id')
+                enseignant_users_list.append(melange)
+        
+        return Response(enseignant_users_list, status=status.HTTP_200_OK)
     def put(self,request):
         id=request.data['id']
         user=MyUser.objects.get(id=id)
