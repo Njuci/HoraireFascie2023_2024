@@ -1,10 +1,12 @@
 from django.urls import path
-from .views import DomaineView,FaculteView,FiliereView,MentionView,PromotionView,Unite_EnsView,Elenent_ConstView,AnacadView,Partie_ecView
+from .views import (DomaineView,FaculteView,FiliereView,MentionView,PromotionView,Unite_EnsView,
+                    Elenent_ConstView,AnacadView,Partie_ecView,Get_FiliereByFaculte)
 
 urlpatterns = [
     path('domaine/',DomaineView.as_view()),
     path('faculte/',FaculteView.as_view()),
     path('filiere/',FiliereView.as_view()),
+    path('get_filiere_by_faculte/<str:id_facul>/',Get_FiliereByFaculte.as_view()),
     path('mention/',MentionView.as_view()),
     path('promotion/',PromotionView.as_view()),
     path('anacad/',AnacadView.as_view()),

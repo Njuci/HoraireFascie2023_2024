@@ -94,7 +94,6 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 
 
-"""
 
 DATABASES = {
     'default': {
@@ -127,6 +126,7 @@ DATABASES = {
 
 
 
+"""
 
 
 # Password validation

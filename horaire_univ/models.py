@@ -60,8 +60,11 @@ class Partie_ec(models.Model):
         ('tp', 'Travail Pratique'),
         ('cmi', 'Cours magistral'),
     )
+    
 
     partie_ec_choice = models.CharField(max_length=68, choices=PARTIE_CHOICES)
+    date_debut=models.DateField()
+    date_fin=models.DateField()
     def __str__(self) -> str:
         return f"{self.id_anacad.denom_anacad} {self.id_ec.denom_ec}  {self.partie_ec_choice}"
     
@@ -69,6 +72,4 @@ class Partie_ec(models.Model):
         unique_together = (('id_ec', 'partie_ec_choice', 'id_anacad')) # Assurer l'unicité de la combinaison de ces trois champs
         
 class Programme_ec(models.Model):
-    id_partie_ec=models.OneToOneField(Partie_ec,on_delete=models.CASCADE)#pour eviter l'erreur de duplication des programmes des partie_ec
-    date_debut=models.DateField()
-    date_fin=models.DateField()
+    pass

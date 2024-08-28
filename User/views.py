@@ -1,11 +1,16 @@
 from django.shortcuts import render
 # Create your views here.
-from .models import MyUser,Enseignant,Chef_Promotion,Encadreur_faculte
+from .models import MyUser,Enseignant,Chef_Promotion,Encadreur_faculte,Faculte
 from .serializers import Utilisateur_Serial,Enseignant_Serial,Chef_Promotion_Serial,Encadreur_faculte_Serial
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.response import Response
+from dispo_app.models import Anacad
+from horaire_univ.models import Partie_ec
+from horaire_univ.serializers import Partie_ec_serial,Faculte_serial,Anacad_serial
+
+from django.db.models import Max
 from rest_framework import status
 
 
@@ -219,15 +224,75 @@ class RegisterView_encadreur_faculte(APIView):
         serializer=Encadreur_faculte_Serial(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
 class LoginView(APIView):
-    def get(self,request):
-        email=request.data['email']
-        password=request.data['password']
+    def get(self,request,email):
+        
         try:
-            user = MyUser.objects.get(email=email)
-            if user.check_password(password):
-                serial=Utilisateur_Serial(user)
-                return Response({"user": serial.data}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            user=MyUser.objects.get(email=email)
+            serial=Utilisateur_Serial(user)
+            return Response(serial.data,status=status.HTTP_200_OK)        
         except MyUser.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class LoginViewEncadreur(APIView):
+    def get(self, request, email, anacad):
+        try:
+            user = MyUser.objects.get(email=email)
+            user_serial = Utilisateur_Serial(user).data
+            
+            enseignant = Enseignant.objects.get(id_user=user)
+            enseignant_serial = Enseignant_Serial(enseignant).data
+            
+            anacadem = Anacad.objects.get(denom_anacad=anacad)
+            anacadem_serial = Anacad_serial(anacadem).data
+            
+            encadreur = Encadreur_faculte.objects.get(id_anacad=anacadem, id_ens=enseignant)
+            encadreur_serial = Encadreur_faculte_Serial(encadreur).data
+            faculte = Faculte.objects.get(id=encadreur.id_faculte.id)
+            faculte_serial = Faculte_serial(faculte).data
+            # Mélanger les dictionnaires sérialisés
+            melange = {**enseignant_serial, **user_serial, **anacadem_serial, **encadreur_serial, **faculte_serial}
+            melange['id_encadreur'] = encadreur.id
+            melange['id_fac'] = faculte.id
+            melange.pop('id', None)  # Supprimer la clé 'id' si elle existe
+            
+            return Response(melange, status=status.HTTP_200_OK)
+        
+        except MyUser.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Enseignant.DoesNotExist:
+            return Response({"message": "User is not an enseignant"}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Anacad.DoesNotExist:
+            return Response({"message": "Anacad not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Encadreur_faculte.DoesNotExist:
+            return Response({"message": "Cette encadreur n'a pas de faculte pour cette annee"}, status=status.HTTP_404_NOT_FOUND)
+
+class EnseignantPartieEcAPIView(APIView):
+
+    def get(self, request, email,anacad):
+        try:
+            # 1. Trouver l'utilisateur par email
+            user = MyUser.objects.get(email=email)
+            
+            # 2. Trouver l'instance d'Enseignant associée
+            enseignant = Enseignant.objects.get(id_user=user)
+            
+            anacad = Anacad.objects.get(denom_anacad=anacad)
+            
+            # 4. Récupérer les parties EC assignées à cet enseignant pour la dernière année académique
+            parties_ec = Partie_ec.objects.filter(id_enseignant=enseignant, id_anacad=anacad)
+            if not parties_ec.exists():
+                return Response({'error': 'Aucune partie EC trouvée pour cet enseignant.'}, status=status.HTTP_404_NOT_FOUND)
+            
+            # 5. Sérialiser les résultats
+            serializer = Partie_ec_serial(parties_ec, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except MyUser.DoesNotExist:
+            return Response({'error': 'Utilisateur non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Enseignant.DoesNotExist:
+            return Response({'error': 'Enseignant non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Anacad.DoesNotExist:
+            return Response({'error': 'Année académique non trouvée.'}, status=status.HTTP_404_NOT_FOUND)

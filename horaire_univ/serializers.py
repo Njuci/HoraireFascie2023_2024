@@ -56,7 +56,14 @@ class Partie_ec_serial(ModelSerializer):
         model=Partie_ec
         fields='__all__'
         
+    def get_promotion(self, obj):
+        return f"{obj.id_ec.id_ue.id_promotion.nom_prom}"
 
+    def get_unite_ens(self, obj):
+        return f"{obj.id_ec.id_ue.code_ue} - {obj.id_ec.id_ue.denom_ue}"
+
+    def get_element_const(self, obj):
+        return f"{obj.id_ec.denom_ec}"
 
 
 """class MyListSerial(ModelSerializer):

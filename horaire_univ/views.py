@@ -61,6 +61,8 @@ class DomaineView(APIView):
         if domaine.delete():
             return Response({"messafe":"domaine supprimé"},status=status.HTTP_204_NO_CONTENT)
         return Response({"message":"domaine non supprimé"},status=status.HTTP_400_BAD_REQUEST)
+
+
 #faculte
 class FaculteView(APIView):
     def get(self,request):
@@ -169,8 +171,28 @@ class FiliereView(APIView):
         filiere=Filiere.objects.get(id=id)
         filiere.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
+class Get_FiliereByFaculte(APIView):
+    def post(self,request,id_facul):
+       
+        id_fac=id_facul
+        filiere=Filiere.objects.filter(id_fac=id_fac)
+        serializer=Filiere_serial(filiere,many=True)
+        liste_filiere=[]
+        
+        for i in serializer.data:
+            
+            fac=Faculte.objects.get(id=i['id_fac'])
+            fac_serial=Faculte_serial(fac)
+            domaine=Domaine.objects.get(id=fac_serial.data['id_dom'])
+            
+            i['nom_fac']=fac.nom_fac
+            i['nom_dom']=domaine.nom_dom
+            liste_filiere.append(i)
+        return Response(liste_filiere,status=status.HTTP_200_OK)    
 #mention
+
 class MentionView(APIView):
     def get(self,request):
         """ [
