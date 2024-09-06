@@ -251,6 +251,37 @@ class MentionView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class Get_MentionByFiliere(APIView):
+    def get(self,request,id_fil):
+        """
+        pour faire un get
+        [
+    {
+        "id": 1,
+        "nom_mention": "Genie Logiciel",
+        "id_fil": 1,
+        "nom_fac": "Faculte des sciences informatiques",
+        "nom_dom": "Sciences et Technologie",
+        "nom_fil": "Informatique"
+    }"""
+        mention=Mention.objects.filter(id_fil=id_fil)
+        
+        liste_mention=[]
+        serializer=Mention_serial(mention,many=True)
+        for i in serializer.data:
+            fil=Filiere.objects.get(id=i['id_fil'])
+            filserial=Filiere_serial(fil)
+            fac=Faculte.objects.get(id=filserial.data['id_fac'])
+            fac_serial=Faculte_serial(fac)
+            domaine=Domaine.objects.get(id=fac_serial.data['id_dom'])            
+            i['nom_fac']=fac.nom_fac
+            i['nom_dom']=domaine.nom_dom
+            i['nom_fil']=fil.nom_fil
+            liste_mention.append(i)
+        
+        
+        return Response(liste_mention,status=status.HTTP_200_OK)
 #promotion
 class PromotionView(APIView):
     def get(self,request):
