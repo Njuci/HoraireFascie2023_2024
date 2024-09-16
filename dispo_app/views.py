@@ -3,12 +3,17 @@ from .serializers import (Programme_ec_serial,Disponibilite_serial,
                           Horaire_serial,Semestre_serial,DisponibiliteSerializer)
 from .models import Programme_ec,Disponibilite,Horaire,Semestre
 from horaire_univ.models import *
-
+from horaire_univ.serializers import( Partie_ec_serial,Elenent_Const_serial,Unite_Ens_serial,Promotion_serial,Filiere_serial,Mention_serial,
+                                     Faculte_serial)
 # Create your views here.
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from .email_sending import envoi_email
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from User.models import Enseignant
+from User.models import Enseignant,MyUser,Encadreur_faculte
+from User.serializers import Enseignant_Serial,Utilisateur_Serial
     
 #programme_ec
 class Programme_ecView(APIView):
@@ -137,5 +142,177 @@ class AjouterDateDisponibleView2(APIView):
         id_partie_ec=request.data['id_partie_ec']
         
         
-        pass 
+        pass
+
+
+
+
+class Email_envoie(APIView):
+    def post(self,request,id_partie_ec):
+        """ This view help to create and account for testing sending mails."""
+        cxt = {}
+        cxt = {'msg':'email envoie echoue.'}
         
+
+        try:
+            partie_ec = Partie_ec.objects.get(id=id_partie_ec)
+            p_ec = Partie_ec_serial(partie_ec).data
+            id_ec = p_ec['id_ec']
+            #annacad
+            id_anacad = p_ec['id_anacad']
+            annacad = Anacad.objects.get(id=id_anacad)
+            serial_annacad = annacad.denom_anacad
+           
+            
+            enseignant = Enseignant.objects.get(id=p_ec['id_enseignant'])
+            serial_enseignant = Enseignant_Serial(enseignant).data
+            user = MyUser.objects.get(id=serial_enseignant['id_user'])
+            serial_user = Utilisateur_Serial(user).data
+            email = serial_user['email']
+            nom_enseignant = serial_user['first_name'] + " " + serial_user['last_name']
+            
+            tp = ' des Travaux Pratiqes'
+            if p_ec['partie_ec_choice'] == 'cmi':
+                tp = " de cours magistral "
+            
+            ec = Elenent_Const.objects.get(id=id_ec)
+            serial_ec = Elenent_Const_serial(ec).data
+            ue = Unite_Ens.objects.get(id=serial_ec['id_ue'])
+            serial_ue = Unite_Ens_serial(ue).data
+            
+            # Récupérer la promotion
+            promotion = Promotion.objects.get(id=serial_ue['id_promotion'])
+            serial_promotion = Promotion_serial(promotion).data
+            
+            # Récupérer la filière
+            
+            # Récupérer la mention
+            mention = Mention.objects.get(id=serial_promotion['id_mention'])
+            serial_mention = Mention_serial(mention).data
+            
+            filiere = Filiere.objects.get(id=serial_mention['id_fil'])
+            serial_filiere = Filiere_serial(filiere).data
+            
+            # Récupérer la faculté
+            faculte = Faculte.objects.get(id=serial_filiere['id_fac'])
+            serial_faculte = Faculte_serial(faculte).data
+             #chercher le nom de l'encadreur de la faculte dans cette anee academique
+             # Rechercher l'encadreur de la faculté pour l'année académique donnée
+            encadreur = Encadreur_faculte.objects.get(id_faculte=serial_filiere['id_fac'], id_anacad=id_anacad)
+            
+            # Accéder aux informations de l'enseignant associé
+            enseignant = encadreur.id_ens
+            
+            # Récupérer les noms et post-noms de l'utilisateur
+            nom = enseignant.id_user.first_name
+            post_nom = enseignant.id_user.last_name
+            encadreur=f'{nom} {post_nom}'
+            
+                        
+            # Construire la chaîne de cours
+            cours = f"""U.E: {serial_ue['denom_ue']} Element Constitutif: {serial_ec['denom_ec']}"""
+            
+            # Ajouter les informations supplémentaires
+            cours += f"\nPromotion: {serial_promotion['nom_prom']}"
+            cours += f"\nMention: {serial_mention['nom_mention']}"
+            cours += f"\nFilière: {serial_filiere['nom_fil']}"
+            cours += f"\nFaculté: {serial_faculte['nom_fac']}"
+            
+        except Partie_ec.DoesNotExist:
+            return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Enseignant.DoesNotExist:
+            return Response({"message": "Enseignant not found"}, status=status.HTTP_404_NOT_FOUND)
+        except MyUser.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Elenent_Const.DoesNotExist:
+            return Response({"message": "Element Constitutif not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Unite_Ens.DoesNotExist:
+            return Response({"message": "Unite Ens not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Promotion.DoesNotExist:
+            return Response({"message": "Promotion not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Filiere.DoesNotExist:
+            return Response({"message": "Filiere not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Mention.DoesNotExist:
+            return Response({"message": "Mention not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Faculte.DoesNotExist:
+            return Response({"message": "Faculte not found"}, status=status.HTTP_404_NOT_FOUND)       
+                    
+                    
+            
+        if request.method == "POST":
+            email = email
+
+
+            subjet = "Notification"
+            template = 'mail.html'
+            context = {
+                  'enseignant':nom_enseignant,
+                    'partie_ec':tp,
+                    'cours':cours,
+                    'annacad':serial_annacad,
+                    'encadreur':encadreur,
+                    'faculte':serial_faculte['nom_fac']
+                    
+                    
+                    
+                   
+                }
+
+            receivers = [email]
+
+            has_send = envoi_email(
+                    sujet=subjet,
+                    desti=receivers,
+                    template=template,
+                    context=context
+                    )
+
+            if has_send:
+                cxt =  {"msg":"mail envoyee avec success."}
+            else:
+                cxt = {'msg':'email envoie echoue.'}
+            print(has_send)
+            return Response(cxt,status=status.HTTP_200_OK)       
+        
+#DOCUMENTATION DE L'API     
+
+class Get_date_cours(APIView):
+    def get(self, request):
+        id_partie_ec = request.data.get('id_partie_ec')
+        if not id_partie_ec:
+            return Response({"message": "id_partie_ec is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Récupérer la partie EC
+            partie_ec = Partie_ec.objects.get(id=id_partie_ec)
+            serial_partiec = Partie_ec_serial(partie_ec)
+            enseignant = Enseignant.objects.get(id=serial_partiec.data['id_enseignant'])
+            
+            # Récupérer la promotion de la partie EC
+            promotion = Promotion.objects.get(id=partie_ec.id_ec.id_ue.id_promotion)
+            
+            # Obtenir les horaires déjà pris par la promotion durant la période
+            dates_prises_promotion = Horaire.objects.filter(
+                id_partie_ec__id_ec__id_ue__id_promotion=promotion,
+                date__range=(partie_ec.date_debut, partie_ec.date_fin)
+            )
+            
+            # Obtenir les horaires déjà pris par l'enseignant durant la période
+            dates_prises_enseignant = Horaire.objects.filter(
+                id_partie_ec__id_enseignant=enseignant,
+                date__range=(partie_ec.date_debut, partie_ec.date_fin)
+            )
+            
+            # Combiner les deux listes d'horaires
+            dates_prises = dates_prises_promotion.union(dates_prises_enseignant)
+            
+            # Sérialiser les données
+            serializer = Horaire_serial(dates_prises, many=True)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Partie_ec.DoesNotExist:
+            return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Enseignant.DoesNotExist:
+            return Response({"message": "Enseignant not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Promotion.DoesNotExist:
+            return Response({"message": "Promotion not found"}, status=status.HTTP_404_NOT_FOUND)

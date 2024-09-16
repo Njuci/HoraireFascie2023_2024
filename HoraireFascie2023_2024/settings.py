@@ -10,10 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
-
+import datetime
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR=os.path.join(BASE_DIR,'templates')
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -73,7 +76,7 @@ ROOT_URLCONF = 'HoraireFascie2023_2024.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,6 +94,7 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
 
 
 
@@ -123,10 +127,9 @@ DATABASES = {
     }
 }
 
-
-
-
 """
+
+
 
 
 # Password validation
@@ -210,3 +213,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL='User.MyUser'
+
+
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST= 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "augustinnjuci@gmail.com"
+EMAIL_HOST_PASSWORD = 'fmzyfuvjvqxgjcwk'
+EMAIL_USE_TLS = True

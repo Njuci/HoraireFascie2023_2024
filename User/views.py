@@ -195,11 +195,18 @@ class RegisterView_chef_promotion(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 class RegisterView_encadreur_faculte(APIView):
     def post(self,request):
-        serial=Encadreur_faculte(request.data)
+        """ 
+        
+            { "id_ens": 4,
+        "id_faculte": 2,
+        "id_anacad": 1}
+        
+        """
+        serial=Encadreur_faculte_Serial(data=request.data)
         if serial.is_valid():
             serial.save()
         else:
-            return Response(serial.erros,status=status.HTTP_400_BAD_REQUEST)
+            return Response(serial.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serial.data,status=status.HTTP_201_CREATED)
     def put(self,request):
         id = request.data['id']
@@ -218,10 +225,11 @@ class RegisterView_encadreur_faculte(APIView):
             return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
     def get(self,request):
-        """ en cardeur par id"""
-        id=request.data['id']
-        user=Encadreur_faculte.objects.get(id=id)
-        serializer=Encadreur_faculte_Serial(user)
+        """
+        """
+    
+        user=Encadreur_faculte.objects.all()
+        serializer=Encadreur_faculte_Serial(user,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 class LoginView(APIView):
     def get(self,request,email):
@@ -235,6 +243,10 @@ class LoginView(APIView):
         
 class LoginViewEncadreur(APIView):
     def get(self, request, email, anacad):
+        """ 
+        
+        
+            """
         try:
             user = MyUser.objects.get(email=email)
             user_serial = Utilisateur_Serial(user).data

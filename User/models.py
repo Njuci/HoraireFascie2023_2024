@@ -44,6 +44,8 @@ class Enseignant(models.Model):
     niveau_ens=models.CharField(max_length=100,blank=True)
     statut_choice=(('permanent','Permanant'),('visiteur','Visiteur'))
     statut=models.CharField(max_length=10,choices=statut_choice)
+    def __str__(self):
+        return self.id_user.email
 
 class Chef_Promotion(models.Model):
     id_user=models.OneToOneField(MyUser,on_delete=models.CASCADE,unique=True)
@@ -54,14 +56,14 @@ class  Encadreur_faculte(models.Model):
     id_ens=models.ForeignKey(Enseignant,on_delete=models.CASCADE)
     id_faculte=models.ForeignKey(Faculte,on_delete=models.CASCADE)
     id_anacad=models.ForeignKey(Anacad,on_delete=models.CASCADE)
-    
+    def __str__(self):
+        return self.id_ens.id_user.email
     class Meta:        
-        unique_together = ('id_faculte','id_anacad') 
+        unique_together = (('id_faculte','id_anacad'),('id_ens','id_anacad') )
         #pour que un enseignant ne peut pas etre encadreur de la meme faculte dans la meme année anacademique  deux fois
     
     
-    
-    
+
     
     
     

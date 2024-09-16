@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Domaine,Faculte,Filiere,Mention,Promotion,Unite_Ens,Elenent_Const,Partie_ec,Anacad
+from User.models import *
+from User.serializers import *
 
 
 from .serializers import (Domaine_serial,Faculte_serial,Filiere_serial,Mention_serial,Promotion_serial,Unite_Ens_serial,
@@ -77,12 +79,34 @@ class FaculteView(APIView):
                                     ]    
         
         """
+        dernier_anacad = Anacad.objects.latest('id')
+        serial_anacad=Anacad_serial(dernier_anacad)
+        
         faculte=Faculte.objects.all()
+        
         serializer=Faculte_serial(faculte,many=True)
         liste_fac=[]
         for i in serializer.data:
             domaine=Domaine.objects.get(id=i['id_dom'])
-            i['nom_dom']=domaine.nom_dom
+            print(i['id'],serial_anacad.data['id'])
+            i['nom_dom'] = domaine.nom_dom
+            try:
+                encadreur = Encadreur_faculte.objects.get(id_faculte=i['id'], id_anacad=serial_anacad.data['id'])
+                serial_encadreur = Encadreur_faculte_Serial(encadreur).data  # Ajout de .data pour accéder aux données sérialisées
+                enseignant = Enseignant.objects.get(id=serial_encadreur['id_ens'])  # Utilisation de id= pour la requête
+                serial_enseignant = Enseignant_Serial(enseignant).data  # Ajout de .data pour accéder aux données sérialisées
+                user = MyUser.objects.get(id=serial_enseignant['id_user'])  # Utilisation de id= pour la requête
+                serial_user = Utilisateur_Serial(user).data  # Ajout de .data pour accéder aux données sérialisées
+                i['nom_encadreur'] = serial_user['first_name'] + " " + serial_user['last_name']
+            except Encadreur_faculte.DoesNotExist:
+                print("errors")
+                pass
+            except Enseignant.DoesNotExist:
+                print("print")
+                pass
+            
+            
+            
             liste_fac.append(i)
             
         return Response(liste_fac)
@@ -258,7 +282,7 @@ class Get_MentionByFiliere(APIView):
         pour faire un get
         [
     {
-        "id": 1,
+    "id": 1,
         "nom_mention": "Genie Logiciel",
         "id_fil": 1,
         "nom_fac": "Faculte des sciences informatiques",
