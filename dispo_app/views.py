@@ -144,6 +144,118 @@ class AjouterDateDisponibleView2(APIView):
         
         pass
 
+def sending_mail(id_partie_ec):
+    
+        try:
+            partie_ec = Partie_ec.objects.get(id=id_partie_ec)
+            p_ec = Partie_ec_serial(partie_ec).data
+            id_ec = p_ec['id_ec']
+            #annacad
+            id_anacad = p_ec['id_anacad']
+            annacad = Anacad.objects.get(id=id_anacad)
+            serial_annacad = annacad.denom_anacad
+           
+            
+            enseignant = Enseignant.objects.get(id=p_ec['id_enseignant'])
+            serial_enseignant = Enseignant_Serial(enseignant).data
+            user = MyUser.objects.get(id=serial_enseignant['id_user'])
+            serial_user = Utilisateur_Serial(user).data
+            email = serial_user['email']
+            nom_enseignant = serial_user['first_name'] + " " + serial_user['last_name']
+            
+            tp = ' des Travaux Pratiqes'
+            if p_ec['partie_ec_choice'] == 'cmi':
+                tp = " de cours magistral "
+            
+            ec = Elenent_Const.objects.get(id=id_ec)
+            serial_ec = Elenent_Const_serial(ec).data
+            ue = Unite_Ens.objects.get(id=serial_ec['id_ue'])
+            serial_ue = Unite_Ens_serial(ue).data
+            
+            # Récupérer la promotion
+            promotion = Promotion.objects.get(id=serial_ue['id_promotion'])
+            serial_promotion = Promotion_serial(promotion).data
+            
+            # Récupérer la filière
+            
+            # Récupérer la mention
+            mention = Mention.objects.get(id=serial_promotion['id_mention'])
+            serial_mention = Mention_serial(mention).data
+            
+            filiere = Filiere.objects.get(id=serial_mention['id_fil'])
+            serial_filiere = Filiere_serial(filiere).data
+            
+            # Récupérer la faculté
+            faculte = Faculte.objects.get(id=serial_filiere['id_fac'])
+            serial_faculte = Faculte_serial(faculte).data
+             #chercher le nom de l'encadreur de la faculte dans cette anee academique
+             # Rechercher l'encadreur de la faculté pour l'année académique donnée
+            encadreur = Encadreur_faculte.objects.get(id_faculte=serial_filiere['id_fac'], id_anacad=id_anacad)
+            
+            # Accéder aux informations de l'enseignant associé
+            enseignant = encadreur.id_ens
+            
+            # Récupérer les noms et post-noms de l'utilisateur
+            nom = enseignant.id_user.first_name
+            post_nom = enseignant.id_user.last_name
+            encadreur=f'{nom} {post_nom}'
+            
+                        
+            # Construire la chaîne de cours
+            cours = f"""U.E: {serial_ue['denom_ue']} Element Constitutif: {serial_ec['denom_ec']}"""
+            
+            # Ajouter les informations supplémentaires
+            cours += f"\nPromotion: {serial_promotion['nom_prom']}"
+            cours += f"\nMention: {serial_mention['nom_mention']}"
+            cours += f"\nFilière: {serial_filiere['nom_fil']}"
+            cours += f"\nFaculté: {serial_faculte['nom_fac']}"
+            
+        except Partie_ec.DoesNotExist:
+            return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Enseignant.DoesNotExist:
+            return Response({"message": "Enseignant not found"}, status=status.HTTP_404_NOT_FOUND)
+        except MyUser.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Elenent_Const.DoesNotExist:
+            return Response({"message": "Element Constitutif not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Unite_Ens.DoesNotExist:
+            return Response({"message": "Unite Ens not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Promotion.DoesNotExist:
+            return Response({"message": "Promotion not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Filiere.DoesNotExist:
+            return Response({"message": "Filiere not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Mention.DoesNotExist:
+            return Response({"message": "Mention not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Faculte.DoesNotExist:
+            return Response({"message": "Faculte not found"}, status=status.HTTP_404_NOT_FOUND)       
+                    
+        email = email
+
+
+        subjet = "Notification"
+        template = 'mail.html'
+        context = {
+                  'enseignant':nom_enseignant,
+                    'partie_ec':tp,
+                    'cours':cours,
+                    'annacad':serial_annacad,
+                    'encadreur':encadreur,
+                    'faculte':serial_faculte['nom_fac']
+                    
+                    
+                    
+                   
+                }
+
+        receivers = [email]
+
+        has_send = envoi_email(
+                    sujet=subjet,
+                    desti=receivers,
+                    template=template,
+                    context=context
+                    )
+        return has_send
 
 
 
