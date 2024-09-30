@@ -33,4 +33,3 @@ class Semestre(models.Model):
     class Meta:
         unique_together=(('anacad','senestre_period'))#pour qu'un semestre ne soit assigner une seul fois durant une année
 
-    

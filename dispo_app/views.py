@@ -46,20 +46,29 @@ class Programme_ecView(APIView):
     
 #disponibilite
 class DisponibiliteView(APIView):
+    
+    
     def get(self,request):
         disponibilite=Disponibilite.objects.all()
         serializer=Disponibilite_serial(disponibilite,many=True)
         return Response(serializer.data)
     
     def post(self,request):
-        id_partie_ec=request.data['id_partie_ec']
-        #verifier si l'enseignant a deja une disponibilite pour cette partie_ec
-        disponibilite=Disponibilite.objects.filter(id_partie_ec=id_partie_ec)
-        partie_ec=Partie_ec.objects.get(id=id_partie_ec)
-        #verifier si la partie_ec a deja un programme_ec
-        programme_ec=Programme_ec.objects.filter(id_partie_ec=id_partie_ec)
-        #avoir la promotion de la partie_ec
-        promotion=Promotion.objects.get(id=partie_ec.id_ec.id_ue.id_promotion) 
+        
+        print(request.data)
+        """       serializer=Disponibilite_serial(data=request.data)  
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            
+    """
+ 
+
+        
+        
+        return 0 
         #avoir la mention de la promotion
         
     def put(self,request):

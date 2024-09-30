@@ -6,8 +6,9 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.response import Response
-from dispo_app.models import Anacad
-from horaire_univ.models import Partie_ec
+from dispo_app.models import Anacad,Disponibilite,Horaire
+from dispo_app.serializers import Disponibilite_serial,Horaire_serial
+from horaire_univ.models import Partie_ec,Anacad,Elenent_Const,Unite_Ens,Promotion,Mention,Filiere,Faculte
 from horaire_univ.serializers import Partie_ec_serial,Faculte_serial,Anacad_serial
 
 from django.db.models import Max
@@ -281,7 +282,7 @@ class LoginViewEncadreur(APIView):
         except Encadreur_faculte.DoesNotExist:
             return Response({"message": "Cette encadreur n'a pas de faculte pour cette annee"}, status=status.HTTP_404_NOT_FOUND)
 
-class EnseignantPartieEcAPIView(APIView):
+class EnseignantPartieEcAPIView(APIView):  
 
     def get(self, request, email,anacad):
         try:
@@ -307,4 +308,88 @@ class EnseignantPartieEcAPIView(APIView):
         except Enseignant.DoesNotExist:
             return Response({'error': 'Enseignant non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
         except Anacad.DoesNotExist:
+            return Response({'error': 'Année académique non trouvée.'}, status=status.HTTP_404_NOT_FOUND
+                            )
+            
+            
+class LoginEnseignant(APIView):
+    def get(self, request, email, anacad):
+        try:
+            user = MyUser.objects.get(email=email)
+            serial_user = Utilisateur_Serial(user)
+            enseignant = Enseignant.objects.get(id_user=user)
+            serial_enseignant = Enseignant_Serial(enseignant)
+            anacad = Anacad.objects.get(denom_anacad=anacad)
+            parties_ec = Partie_ec.objects.filter(id_enseignant=enseignant, id_anacad=anacad)
+            if not parties_ec.exists():
+                return Response({'error': 'Aucune partie EC trouvée pour cet enseignant.'}, status=status.HTTP_404_NOT_FOUND)
+            serial_parties_ec = Partie_ec_serial(parties_ec, many=True)
+            
+            # Initialiser les structures de données imbriquées
+            # Condenser l'objet user et l'objet enseignant dans un seul dictionnaire
+            data = {**serial_user.data, **serial_enseignant.data}
+            # Spécifier l'id user et l'id enseignant
+            data['id_user'] = user.id
+            data['id_enseignant'] = enseignant.id
+            #drop id in data
+            data.pop('id')   
+            # Ajouter les parties EC
+            data['parties_ec'] = []
+            for i in serial_parties_ec.data:
+                if Disponibilite.objects.filter(id_partie_ec=i['id']).exists():
+                    i['dispo'] = 'completé'
+                else:
+                    i['dispo'] = 'pas encore completé'
+                
+                total_heure = 0
+                horaires = Horaire.objects.filter(id_partie_ec=i['id'])
+                if horaires.exists():
+                    for j in horaires:
+                        if j.partie_journ == 'matin':
+                            total_heure += 4
+                        else:
+                            total_heure += 4
+                    pourcentage = (total_heure / i['volume_horaire']) * 100
+                else:
+                    pourcentage = 0
+                i['pourcentage'] = pourcentage
+
+                # Récupérer les informations de la promotion, mention, filière et faculté
+                ec = Elenent_Const.objects.get(id=i['id_ec'])
+                ue = Unite_Ens.objects.get(id=ec.id_ue.id)
+                promotion = Promotion.objects.get(id=ue.id_promotion.id)
+                mention = Mention.objects.get(id=promotion.id_mention.id)
+                filiere = Filiere.objects.get(id=mention.id_fil.id)
+                faculte = Faculte.objects.get(id=filiere.id_fac.id)
+
+                # Organiser les données dans les dictionnaires imbriqués
+                partie_ec_data = {
+                    'faculte': faculte.nom_fac,
+                    'filiere': filiere.nom_fil,
+                    'mention': mention.nom_mention,
+                    'promotion': promotion.nom_prom,
+                    'partie_ec': i
+                }
+
+                data['parties_ec'].append(partie_ec_data)
+            
+            return Response(data, status=status.HTTP_200_OK)
+        
+        except MyUser.DoesNotExist:
+            return Response({'error': 'Utilisateur non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Enseignant.DoesNotExist:
+            return Response({'error': 'Enseignant non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Anacad.DoesNotExist:
             return Response({'error': 'Année académique non trouvée.'}, status=status.HTTP_404_NOT_FOUND)
+        except Elenent_Const.DoesNotExist:
+            return Response({'error': 'Element Constitutif non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Unite_Ens.DoesNotExist:
+            return Response({'error': 'Unite Ens non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Promotion.DoesNotExist:
+            return Response({'error': 'Promotion non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Filiere.DoesNotExist:
+            return Response({'error': 'Filiere non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Mention.DoesNotExist:
+            return Response({'error': 'Mention non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        except Faculte.DoesNotExist:
+            return Response({'error': 'Faculte non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
