@@ -96,7 +96,7 @@ class AjouterDateDisponibleView(APIView):
             id_partie_ec = serializer.validated_data['id_partie_ec']
             date_libre = serializer.validated_data['date_libre']
             partie_journ = serializer.validated_data['partie_journ']
-            
+             
             # Récupérer la partie_ec
             try:
                 partie_ec = Partie_ec.objects.get(id=id_partie_ec)

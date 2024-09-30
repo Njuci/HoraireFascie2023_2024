@@ -1,7 +1,7 @@
 
 from django.urls import path
 from .views import (RegisterView_user,RegisterView_enseignant,RegisterView_chef_promotion,RegisterView_encadreur_faculte,
-                    EnseignantPartieEcAPIView,LoginView,LoginViewEncadreur,LoginEnseignant
+                    EnseignantPartieEcAPIView,LoginView,LoginViewEncadreur,LoginEnseignant,EnseignantPartieEc
 )
 urlpatterns=[ 
               path('user/',RegisterView_user.as_view()),
@@ -13,7 +13,8 @@ urlpatterns=[
                  path('login/<str:email>/', LoginView.as_view(), name='login'),
                  
                  path('login_encadreur/<str:email>/<str:anacad>/', LoginViewEncadreur.as_view(), name='login_encadreur'),
-                 path('login_enseignant/<str:email>/<str:anacad>', LoginEnseignant.as_view(), name='login_enseignant'),
+                 path('login_enseignant/<str:email>/<str:anacad>/', LoginEnseignant.as_view(), name='login_enseignant'),
+                 path('enseignant_partie_ec/<str:email>/<str:anacad>/',EnseignantPartieEc.as_view(), name='login_enseignant'),
                   
                   
               
