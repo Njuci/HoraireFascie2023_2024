@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "elated-ranger-437311-b2",
+  "private_key_id": "19e626bd0c343ae305742c537ccc6fc7cccc6ea4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDjd/9wadHRQxrZ\n8ZNISksRLe6KpaNIKTHYpKK2xm3VeUlsKp+BKStJnEfOY6UdVC6WeufKYA12RlMy\nvn7OnOoIBISgpJ2R+ABZK6Ny5k3x/3mSgcA5JG0E48df38cgN+jqcByYv4YFrpmT\nGnYUlSAkwZI5ue+XrM6cv4lR/++Kf3l3h/k+tOGnkAJZ5cVo/EorplZrIV2fnVwP\nRLbJFYI2cB9Fw4HYa0SuImW3dd3jdZVHZvbjg/0K8z2vG/bDVqbPT4YF4/emAhTh\naydo35yC3obhBIXBHuVIpZy+ee8BL0bLsb3W9ZIl38ipz3SJvQpc1LZCqHJSZFeE\nB96Ua/WxAgMBAAECggEAQO5KjLiwK3dnzUmvnKWUawl8+7fPdbRIpcpNJjZbOOIf\nytAZ6uEpGaCSQMBh7A7RI6Re0P59KUNm0WfeQ7U3+uTrRP3oerfbxZh21kAWhNtD\nxUXjbIxQ0GIC0gPLUA+VnYI2L4YQSEPwU7TsevCcldFpn6/LTDUIX2cvWChiJNq3\nuXyUomcirq/RjACo0U86GKcN2qreBbMPQqN70G2lXGc/nW6nD8dvtvr/G/p+M1Ez\nxGDdjQQ+VSo/xPcDASIMG7GPXq+PQ87EU2dzj9LweSEFifqPRo8Z6CJX1/ns05ut\ntTvVEZ3NRanO9sBZ2NI8R5OEZLmnfYlsZ8ZLjLegFwKBgQDyC9vHX8GDwTe5ImV3\ndS6TSiLUg72+ELgem66RiGjPBPdzTjx6AXs2q/dfQvfyNGCOe4Wk1ta+27CBemIf\nEw6fgTvAaXLP6J7UqefWb0p6A+q9SjHJsDW00LjBbP8HVnJ94J0QISmgFCC2ZhD7\nxFKuO0O8j15fKDxn2JScpUAmkwKBgQDwlQCF4R2tegpBL8DGIPYZIt48Dk+uvXSS\nC6MHrNRVLltPzOIkIEdt7FhxPcDJaf9+Obj+YpACI5D4Mfp3oRrOJ+VFiTBojPqX\nUn6kwOwoBEBq4vfpWlDAwodk9v0X/iZ8O31OEid0UUSdfQd9eCjKOWvBHnwtWpmL\nY1n6Zi55KwKBgDbNBIeRYIjqGCmsZfiz6UWjxVsEMNN1iZo0eUOt9LzaTQQoNH0T\nFMh+CtXgna6SuUHJKar2kUxJBR9rjAepEuh+I/8eYMY9zqgrh7f/Hoedl2ogAEG/\nyYkUsJ/qg5svsWBamHTsbTY3GGjzlujJvEaCWIW6mA1HWNXSLWOB7pJNAoGBAN2R\nDJNAGTn8TFduqEaQcrYBo9SBhaczupkKeJIH/OGaOORMl/SXedFluqpIKjYVFgVl\nGdfGZERkBw5d0QO97tbwbTnWOCwBsoQMqLAJMTVFfSIzeAiEchyky1cUFVG0cjM2\nApgVJhr9AYldbbmDIWXk7jVEYy7N4t05mdN/qctTAoGBAI8aJPClnLYUeiJb3oj7\nMpR/7f/dBkL+8w1LcFrH4JTwzXQRrLBDBJqFMkWAeyG2WnjuzB9RG03lul/+HjCS\nytu+5i3yhiPzRMp+WXf79ECqhqyTVyYXPYBE7wdrr3hzHHP39kbHeOHPcHv7QXo1\nATU5lPRCOau4lyv8lqqJ71xo\n-----END PRIVATE KEY-----\n",
+  "client_email": "sqlservice@elated-ranger-437311-b2.iam.gserviceaccount.com",
+  "client_id": "113836890216519880119",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sqlservice%40elated-ranger-437311-b2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

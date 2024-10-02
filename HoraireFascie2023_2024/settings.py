@@ -102,6 +102,22 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'horaire_univ',
+        'USER': 'njuci',
+        'PASSWORD': '3670njci',        
+       'HOST': '34.122.218.103',  # Utilisez l'adresse IP publique
+        'PORT': '3306'
+    }
+}
+
+
+
+
+"""
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'horaire_ucb',
         'USER': 'root',
         'PASSWORD': '3670njci',        
@@ -110,8 +126,6 @@ DATABASES = {
     }
 }
 
-
-"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
