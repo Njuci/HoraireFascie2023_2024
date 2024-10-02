@@ -24,4 +24,6 @@ RUN pip install --default-timeout=100 -r requirements.txt
 
 # Copier le reste des fichiers du projet
 COPY . .
-CMD ["python", "manage.py", "runserver", "0.0.0.0:$PORT"]
+
+CMD ["sh", "-c", "python manage.py runserver 0.0.0.0:$PORT"]
+
