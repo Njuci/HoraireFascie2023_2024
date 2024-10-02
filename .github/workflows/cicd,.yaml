@@ -1,0 +1,51 @@
+name: Deploy to Cloud Run
+
+env:
+  SERVICE_NAME: custom-hora-service  # Nom du service Cloud Run
+  PROJECT_ID: h-t-d-a-f-a-t-g-c-r     # ID du projet Google Cloud
+  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/h-t-d-a-f-a-t-g-c-r/custom-fastapi/custom-fastapi  # URL du registre de conteneurs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dockerize-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Google Cloud Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'  # Utilisation de la clé de service Google Cloud
+          project_id: ${{ env.PROJECT_ID }}  # Utilisation de la variable PROJECT_ID
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: ${{ env.PROJECT_ID }}  # Utilisation de la variable PROJECT_ID
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f Dockerfile.prod .  # Utilisation de la variable DOCKER_IMAGE_URL
+          docker push ${{ env.DOCKER_IMAGE_URL }}:latest  # Utilisation de la variable DOCKER_IMAGE_URL
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo SERVICE_NAME $SERVICE_NAME
+          gcloud run deploy $SERVICE_NAME \  # Utilisation de la variable SERVICE_NAME
+            --image ${{ env.DOCKER_IMAGE_URL }}:latest \  # Utilisation de la variable DOCKER_IMAGE_URL
+            --platform managed \
+            --region us-east1 \
+            --allow-unauthenticated

@@ -25,5 +25,14 @@ RUN pip install --default-timeout=100 -r requirements.txt
 # Copier le reste des fichiers du projet
 COPY . .
 
-CMD ["sh", "-c", "python manage.py runserver 0.0.0.0:$PORT"]
+# Collecter les fichiers statiques
+RUN python manage.py collectstatic --noinput
 
+# Appliquer les migrations de la base de données
+RUN python manage.py migrate --noinput
+
+# Exposer le port 8000 pour la production
+EXPOSE 8000
+
+# Lancer Gunicorn en tant que serveur de production avec Django
+CMD ["gunicorn", "--bind", "0.0.0.0:${PORT:-8000}", "HoraireFascie2023_2024.wsgi:application"]
