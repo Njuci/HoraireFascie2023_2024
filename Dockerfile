@@ -26,4 +26,4 @@ RUN pip install --default-timeout=100 -r requirements.txt
 COPY . .
 
 # Démarrer l'application Django sans spécifier de port (Cloud Run gère cela automatiquement)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0"]
