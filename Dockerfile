@@ -25,8 +25,8 @@ RUN pip install --default-timeout=100 -r requirements.txt
 # Copier le reste des fichiers du projet
 COPY . .
 
-# Exposer le port 8000 pour le serveur Django
-EXPOSE 8000
+# Exposer le port 8080 pour Cloud Run
+EXPOSE 8080
 
-# Démarrer l'application Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+# Démarrer l'application Django sur le port défini par la variable d'environnement
+CMD ["python", "manage.py", "runserver", "0.0.0.0:${PORT:-8080}"]
