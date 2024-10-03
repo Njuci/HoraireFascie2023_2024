@@ -33,4 +33,4 @@ EXPOSE 8080
 ENV PORT=8080
 
 # Command to run the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "HoraireFascie2023_2024.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "HoraireFascie2023_2024.wsgi:application"]
