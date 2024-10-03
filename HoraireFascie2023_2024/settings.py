@@ -97,6 +97,8 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 
 
+# Chemin absolu vers le répertoire où collecter les fichiers statiques
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 DATABASES = {

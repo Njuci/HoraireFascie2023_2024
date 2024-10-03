@@ -1,38 +1,32 @@
-# Utiliser une image Python slim comme base
 FROM python:3.10-slim
 
-# Définir le répertoire de travail
+# Set the working directory
 WORKDIR /HoraireFascie2023_2024
 
-# Créer le fichier sources.list si non existant et utiliser un autre miroir Debian
+# Create the sources.list file if it doesn't exist and use a different Debian mirror
 RUN [ ! -f /etc/apt/sources.list ] && echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list
 RUN sed -i 's|http://deb.debian.org/debian|http://ftp.de.debian.org/debian|g' /etc/apt/sources.list
 
-# Installer pkg-config, gcc, wget, et les bibliothèques de développement MariaDB
+# Install pkg-config, gcc, wget, and MariaDB development libraries
 RUN apt-get update && \
     apt-get install -y pkg-config gcc wget libmariadb-dev-compat libmariadb-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Copier le fichier requirements.txt
+# Copy the requirements file
 COPY requirements.txt .
 
-# Mettre à jour pip
+# Upgrade pip
 RUN pip install --upgrade pip
 
-# Installer les dépendances avec un timeout augmenté
+# Install the requirements with increased timeout
 RUN pip install --default-timeout=100 -r requirements.txt
 
-# Copier le reste des fichiers du projet
+# Copy the rest of the files
 COPY . .
 
-# Collecter les fichiers statiques
+# Collect static files
 RUN python manage.py collectstatic --noinput
 
-# Appliquer les migrations de la base de données
+# Apply database migrations
 RUN python manage.py migrate --noinput
-
-# Exposer le port 8000 pour la production
-EXPOSE 8000
-
-# Lancer Gunicorn en tant que serveur de production avec Django
-CMD ["gunicorn", "--bind", "0.0.0.0:${PORT:-8000}", "HoraireFascie2023_2024.wsgi:application"]
+CMD ["gunicorn", "--bind", ":8000", "horairefascie2023_2024.wsgi"] 
