@@ -13,11 +13,17 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import datetime
+import environ
+
+# Initialise environ
+env = environ.Env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-TEMPLATES_DIR=os.path.join(BASE_DIR,'templates')
 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -28,11 +34,11 @@ SECRET_KEY = 'django-insecure-38kvh2xgy+7pa28y4s1#65=3a^pb&fu6ayl^n@l662%8x%3^(p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,13 +51,12 @@ INSTALLED_APPS = [
     'djoser',
     'drf_yasg',
     'User',
-      'dispo_app',
+    'dispo_app',
     'corsheaders',
     'horaire_univ',
-    
-    
 ]
-#cors all origins
+
+# CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -67,21 +72,17 @@ CORS_ALLOW_HEADERS = [
 ]
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
+# Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',             
-              
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-#
 ]
 
 ROOT_URLCONF = 'HoraireFascie2023_2024.urls'
@@ -104,66 +105,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# 
-
-# Chemin absolu vers le répertoire où collecter les fichiers statiques
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
+# Database configuration
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'horaire_univ',
-        'USER': 'njuci',
-        'PASSWORD': '3670njci',        
-       'HOST': '34.122.218.103',  # Utilisez l'adresse IP publique
-        'PORT': '3306'
+        'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
+        'NAME': env('DB_NAME', default='horaire_univ'),
+        'USER': env('DB_USER', default='njuci'),
+        'PASSWORD': env('DB_PASSWORD', default='3670njci'),
+        'HOST': env('DB_HOST', default='34.122.218.103'),
+        'PORT': env('DB_PORT', default='3306'),
     }
 }
-
-
-
-
-"""
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'horaire_ucb',
-        'USER': 'root',
-        'PASSWORD': '3670njci',        
-        'HOST': 'localhost',
-        'PORT': '3306', 
-    }
-}
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'horadb',  # Remplacez par le nom de votre base de données
-        'USER': 'horadb_owner',  # Remplacez par le nom d'utilisateur
-        'PASSWORD': 'zOEQdT16hpyF',  # Remplacez par le mot de passe
-        'HOST': 'ep-flat-star-a537v3dt.us-east-2.aws.neon.tech',  # Remplacez par l'hôte
-        'PORT': 5432,  # Laissez vide pour utiliser le port par défaut (5432)
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-        'DISABLE_SERVER_SIDE_CURSORS': True,
-    }
-}
-
-"""
-
-
-
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -179,14 +133,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
+# JWT settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
@@ -196,59 +149,50 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': False,
 
     'ALGORITHM': 'HS256',
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-    'JWK_URL': None,
-    'LEEWAY': 0,
-
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
-    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
-
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
-
-    'JTI_CLAIM': 'jti',
-
-    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
     'SIGNING_KEY': SECRET_KEY,
-    
 }
-we='postgresql://horadb_owner:zOEQdT16hpyF@ep-flat-star-a537v3dt.us-east-2.aws.neon.tech/horadb?sslmode=require'
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
+# CSRF trusted originsg
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.us-central1.run.app',
+    'https://horaire-fascie-2023-2024-y7h44d5u6a-uc.a.run.app/',
+    
+    'http://localhost:3000'
+]
 
-LANGUAGE_CODE = 'en-us'
+# HTTPS and secure cookie settings
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
+# Static files configuration
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL='User.MyUser'
+# Custom user model
+AUTH_USER_MODEL = 'User.MyUser'
 
-
-
-EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_HOST= 'smtp.gmail.com'
+# Email backend configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "augustinnjuci@gmail.com"
+EMAIL_HOST_USER = 'augustinnjuci@gmail.com'
 EMAIL_HOST_PASSWORD = 'fmzyfuvjvqxgjcwk'
 EMAIL_USE_TLS = True
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True

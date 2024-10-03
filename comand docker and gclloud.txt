@@ -1,0 +1,7 @@
+docker tag
+docker tag    f103ef5410c5   us-central1-docker.pkg.dev/elated-ranger-437311-b2/horaire/quickstart:latest
+
+$ docker push us-central1-docker.pkg.dev/elated-ranger-437311-b2/horaire/quickstart:latest
+ gcloud run deploy horaire-fascie-2023-2024 --image us-central1-docker.pkg.dev/elated-ranger-437311-b2/horaire/quickstart:latest
+
+gcloud beta run services logs read horaire-fascie-2023-2024  --region=us-central1

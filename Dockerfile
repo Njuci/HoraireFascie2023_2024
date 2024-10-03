@@ -14,6 +14,7 @@ COPY requirements.txt .
 # Upgrade pip
 RUN pip install --upgrade pip
 
+
 # Install Python dependencies
 RUN pip install --default-timeout=100 --retries=5 -r requirements.txt
 
