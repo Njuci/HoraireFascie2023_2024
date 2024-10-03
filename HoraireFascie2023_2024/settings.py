@@ -52,7 +52,20 @@ INSTALLED_APPS = [
     
 ]
 #cors all origins
-CORS_ALLOW_ALL_ORIGINS=True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',             
@@ -95,7 +108,7 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-
+# 
 
 # Chemin absolu vers le répertoire où collecter les fichiers statiques
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
