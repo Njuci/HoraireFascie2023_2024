@@ -26,5 +26,11 @@ RUN python manage.py collectstatic --noinput
 # Apply database migrations
 RUN python manage.py migrate --noinput
 
-# Command to run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "horairefascie2023_2024.wsgi:application"]
+# Expose port 8080 for Cloud Run
+EXPOSE 8080
+
+# Define the PORT environment variable using the correct format
+ENV PORT=8080
+
+# Command to run the application using Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "HoraireFascie2023_2024.wsgi:application"]
