@@ -34,8 +34,6 @@ SECRET_KEY = 'django-insecure-38kvh2xgy+7pa28y4s1#65=3a^pb&fu6ayl^n@l662%8x%3^(p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -58,19 +56,6 @@ INSTALLED_APPS = [
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 # Middleware
 MIDDLEWARE = [
@@ -162,7 +147,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.us-central1.run.app',
     'https://horaire-fascie-2023-2024-y7h44d5u6a-uc.a.run.app/',
     
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://myapp-84951033569.us-central1.run.app'
 ]
 
 # HTTPS and secure cookie settings
