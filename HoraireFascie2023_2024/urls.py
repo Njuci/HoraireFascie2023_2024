@@ -25,6 +25,6 @@ urlpatterns = [
     path('schedule/',include('horaire_univ.urls')),
     path('dispo/', include('dispo_app.urls')),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    re_path(r'^swagger/$',schema_view.with_ui('swagger'), name='schema-swagger-ui'),
+    path('swagger/',schema_view.with_ui('swagger'), name='schema-swagger-ui'),
 ]
 # 
