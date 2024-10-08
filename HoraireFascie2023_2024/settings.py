@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure-38kvh2xgy+7pa28y4s1#65=3a^pb&fu6ayl^n@l662%8x%3^(p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','10.128.0.6']
 
 # Application definition
 INSTALLED_APPS = [
@@ -89,9 +89,20 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
+#Database configuration with postgresql
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'horaire_univ',
+        'USER': 'njuci',
+        'PASSWORD': '3670njci',
+        'HOST': '',
+        'PORT': '',
+    }   }
+
 
 # Database configuration
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
         'NAME': env('DB_NAME', default='horaire_univ'),
@@ -101,6 +112,7 @@ DATABASES = {
         'PORT': env('DB_PORT', default='3306'),
     }
 }
+"""
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
