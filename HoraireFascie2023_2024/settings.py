@@ -95,7 +95,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'horaire_univ',
         'USER': 'postgres',
-        'PASSWORD': '',
+        'PASSWORD': 'njci',
         'HOST': 'localhost',
         'PORT': '5432',
     }   }
