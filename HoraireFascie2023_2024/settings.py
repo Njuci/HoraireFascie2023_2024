@@ -96,8 +96,8 @@ DATABASES = {
         'NAME': 'horaire_univ',
         'USER': 'njuci',
         'PASSWORD': '3670njci',
-        'HOST': '',
-        'PORT': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }   }
 
 
