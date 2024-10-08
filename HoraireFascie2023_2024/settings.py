@@ -90,6 +90,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 #Database configuration with postgresql
+
+
+# Database configuration
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -99,16 +103,14 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     }   }
-
-
-# Database configuration
-"""DATABASES = {
+"""
+DATABASES = {
     'default': {
         'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
-        'NAME': env('DB_NAME', default='horaire_univ'),
-        'USER': env('DB_USER', default='njuci'),
-        'PASSWORD': env('DB_PASSWORD', default='3670njci'),
-        'HOST': env('DB_HOST', default='34.122.218.103'),
+        'NAME': 'horaire_ucb',
+        'USER': env('DB_USER', default='root'),
+        'PASSWORD': '3670njci',
+        'HOST': env('DB_HOST', default='localhost'),
         'PORT': env('DB_PORT', default='3306'),
     }
 }
