@@ -96,6 +96,20 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
+        'NAME': 'horaire_ucb',
+        'USER': env('DB_USER', default='njuci'),
+        'PASSWORD': '3670njci',
+        'HOST': env('DB_HOST', default='localhost'),
+        'PORT': env('DB_PORT', default='3306'),
+    }
+}
+CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000',]
+
+"""
+
+DATABASES = {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'horaire_univ',
         'USER': 'postgres',
@@ -103,17 +117,6 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     }   }
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
-        'NAME': 'horaire_ucb',
-        'USER': env('DB_USER', default='root'),
-        'PASSWORD': '3670njci',
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='3306'),
-    }
-}
 """
 
 # Password validation
@@ -157,13 +160,6 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
 }
 # CSRF trusted originsg
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.us-central1.run.app',
-    'https://horaire-fascie-2023-2024-y7h44d5u6a-uc.a.run.app/',
-    
-    'http://localhost:3000',
-    'https://myapp-84951033569.us-central1.run.app'
-]
 # Static files configuration
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
