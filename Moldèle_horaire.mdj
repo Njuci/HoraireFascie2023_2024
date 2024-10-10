@@ -17040,7 +17040,7 @@
 										"$ref": "AAAAAAGSKiwO0hfvzxE="
 									},
 									"font": "Arial;13;0",
-									"left": 56.6181640625,
+									"left": 40.6181640625,
 									"top": 5,
 									"width": 77.30810546875,
 									"height": 13,
@@ -17053,7 +17053,7 @@
 										"$ref": "AAAAAAGSKiwO0hfvzxE="
 									},
 									"font": "Arial;13;1",
-									"left": 21,
+									"left": 5,
 									"top": 5,
 									"width": 29.6181640625,
 									"height": 13,
@@ -17061,7 +17061,6 @@
 								}
 							],
 							"font": "Arial;13;0",
-							"left": 16,
 							"width": 1856,
 							"height": 704,
 							"nameLabel": {
@@ -19201,7 +19200,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGSKmv/fETe7g4="
 							},
-							"name": "id_anacad"
+							"name": "id_anacad",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -19209,7 +19209,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGSKmv/fETe7g4="
 							},
-							"name": "id_enseignant"
+							"name": "id_enseignant",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -19217,7 +19218,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGSKmv/fETe7g4="
 							},
-							"name": "id_faculte"
+							"name": "id_faculte",
+							"type": ""
 						}
 					]
 				},
@@ -19267,7 +19269,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGSKxwF0AtiL64="
 							},
-							"name": "partie_journ"
+							"name": "partie_journ",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -19275,7 +19278,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGSKxwF0AtiL64="
 							},
-							"name": "date"
+							"name": "date",
+							"type": ""
 						}
 					]
 				},
@@ -19293,7 +19297,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGSLjGs/Uu9DnE="
 							},
-							"name": "date_pointage"
+							"name": "date_pointage",
+							"type": ""
 						}
 					]
 				}

@@ -5,3 +5,12 @@ $ docker push us-central1-docker.pkg.dev/elated-ranger-437311-b2/horaire/quickst
  gcloud run deploy horaire-fascie-2023-2024 --image us-central1-docker.pkg.dev/elated-ranger-437311-b2/horaire/quickstart:latest
 
 gcloud beta run services logs read horaire-fascie-2023-2024  --region=us-central1
+
+gcloud run deploy horaire-fascie-2023-2024 --image us-central1-docker.pkg.dev/elated-ranger-437311-b2/horaire/quickstart:latest --platform managed --region us-central1 --allow-unauthenticated --no-traffic
+
+3670njuCi
+
+
+CREATE USER 'njuci'@'%' IDENTIFIED BY '3670njci';
+GRANT ALL PRIVILEGES ON *.* TO 'njuci'@'%' WITH GRANT OPTION;
+

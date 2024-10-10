@@ -705,7 +705,55 @@ class Get_EcByUe(APIView):
 
 
 
+
+
+class Get_Partie_ecByEcAnacad(APIView):
+    def get(self, request, id_ec, id_anacad):
+        """
+        pour faire un get
+        [
+            {
+                "id": 2,
+                "volume_horaire": 45,
+                "partie_ec_choice": "cmi",
+                "date_debut": "2024-11-13",
+                "date_fin": "2025-05-24",
+                "id_ec": 3,
+                "id_anacad": 1,
+                "id_enseignant": 4,
+                "denom_ec": "Python",
+                "niveau_ec": "2",
+                "id_ue": 1,
+                "id_promotion": 1,
+                "nom_prom": "Bac 1",
+                "nom_ue": "Initiation à la programmation"
+            }
+        ]
+        """
+        # 
+        partie_ec = Partie_ec.objects.filter(id_ec=id_ec, id_anacad=id_anacad)
+        # Sérialiser les données
+        serializer = Partie_ec_serial(partie_ec, many=True)
+        
+        # Ajouter les informations de l'EC, de l'UE et de la promotion
+        liste_partie_ec = []
+        for partie in serializer.data:
+            ec = Elenent_Const.objects.get(id=partie['id_ec'])
+            ue = Unite_Ens.objects.get(id=ec.id_ue.id)
+            
+            partie['denom_ec'] = ec.denom_ec
+            partie['niveau_ec'] = ec.niveau_ec
+            partie['id_ue'] = ue.id
+            partie['nom_ue'] = ue.denom_ue
+
+            
+            liste_partie_ec.append(partie)
+        
+        return Response(liste_partie_ec, status=status.HTTP_200_OK)
 #partie_ec
+
+
+
 
 class Partie_ecView(APIView):
     def get(self,request):

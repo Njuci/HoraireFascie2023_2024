@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (DomaineView,FaculteView,FiliereView,MentionView,PromotionView,Unite_EnsView,Get_UeByPromotion,Get_EcByUe,
-                    Elenent_ConstView,AnacadView,Partie_ecView,Get_FiliereByFaculte,Get_MentionByFiliere,Get_MentionByFaculte,Get_PromotionByFaculte)
+                    Elenent_ConstView,AnacadView,Partie_ecView,Get_FiliereByFaculte,Get_MentionByFiliere,
+                    Get_MentionByFaculte,Get_PromotionByFaculte,Get_Partie_ecByEcAnacad)
 
 urlpatterns = [
     path('domaine/',DomaineView.as_view()),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('anacad/',AnacadView.as_view()),
     path('unit_enseign/',Unite_EnsView.as_view()),
     path('elem_const/',Elenent_ConstView.as_view()),
-    path('partie_ec/',Partie_ecView.as_view())
+    path('partie_ec/',Partie_ecView.as_view()),
+    path('get_partie_ec_by_ec_anacad/<str:id_ec>/<str:id_anacad>/',Get_Partie_ecByEcAnacad.as_view())
     
 ]

@@ -16,60 +16,58 @@ from User.models import Enseignant,MyUser,Encadreur_faculte
 from User.serializers import Enseignant_Serial,Utilisateur_Serial
     
 #programme_ec
-class Programme_ecView(APIView):
-    def get(self,request):
-        
-        programme_ec=Programme_ec.objects.all()
-        serializer=Programme_ec_serial(programme_ec,many=True)
-        return Response(serializer.data)
-    def post(self,request):
-        serializer=Programme_ec_serial(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        else:
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-    def put(self,request):
-        id=request.data['id']
-        programme_ec=Programme_ec.objects.get(id=id)
-        serializer=Programme_ec_serial(programme_ec,data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        else:
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-    def delete(self,request):
-        id=request.data['id']
-        programme_ec=Programme_ec.objects.get(id=id)
-        programme_ec.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
     
 #disponibilite
-class DisponibiliteView(APIView):
-    
-    
-    def get(self,request):
-        disponibilite=Disponibilite.objects.all()
-        serializer=Disponibilite_serial(disponibilite,many=True)
-        return Response(serializer.data)
-    
-    def post(self,request):
-        
-        print(request.data)
-        """       serializer=Disponibilite_serial(data=request.data)  
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            
-        else:
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-            
-    """
- 
+import json
+from rest_framework.response import Response
+from rest_framework import status
 
-        
-        
-        return 0 
-        #avoir la mention de la promotion
+class DisponibiliteView(APIView):
+
+    def get(self, request):
+        disponibilite = Disponibilite.objects.all()
+        serializer = Disponibilite_serial(disponibilite, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        # Affichage des données envoyées
+        print(request.data)
+
+        # Conversion de la chaîne 'liste_jours' en une liste de dictionnaires
+        chaine = request.data['liste_jours']
+        chaine_modifiee = '[' + chaine + ']'  # Ajout des crochets pour une liste valide
+        liste_jours = json.loads(chaine_modifiee)  # Conversion en liste de dictionnaires
+
+        # Affichage du résultat pour vérification
+        print(liste_jours)
+
+        # Créer une nouvelle instance de Disponibilite
+        serial_dispo = Disponibilite_serial(data=request.data)
+        if serial_dispo.is_valid(raise_exception=True):
+            serial_dispo.save()
+
+            # Préparer les objets Horaire à partir de la liste des jours
+            id_partie_ec = request.data['id_partie_ec']
+            liste_horaire = []
+
+            for jour in liste_jours:
+                # Créer une instance d'Horaire pour chaque jour
+                horaire = Horaire(
+                    id_partie_ec_id=id_partie_ec,  # Assurez-vous que c'est un FK ID
+                    date=jour['date'],
+                    partie_journ=jour['partie_journ']
+                )
+                liste_horaire.append(horaire)
+
+            # BULK CREATE : insérer tous les objets Horaire en une seule requête
+            Horaire.objects.bulk_create(liste_horaire)
+
+            return Response({"message": "Disponibilité et horaires créés avec succès."}, status=status.HTTP_201_CREATED)
+
+        else:
+            return Response(serial_dispo.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+             
         
     def put(self,request):
         id=request.data['id']
@@ -267,7 +265,63 @@ def sending_mail(id_partie_ec):
         return has_send
 
 
-
+class Get_date_cours(APIView):
+    def get(self, request, id_partie_ec):
+        try:
+            # Récupérer la partie EC
+            partie_ec = Partie_ec.objects.get(id=id_partie_ec)
+            serial_partiec = Partie_ec_serial(partie_ec)
+            enseignant = Enseignant.objects.get(id=serial_partiec.data['id_enseignant'])
+            
+            # Récupérer la promotion de la partie EC
+            promotion_id = partie_ec.id_ec.id_ue.id_promotion.id
+            
+            # Obtenir les horaires déjà pris par la promotion durant la période
+            dates_prises_promotion = Horaire.objects.filter(
+                id_partie_ec__id_ec__id_ue__id_promotion=promotion_id,
+                date__range=(partie_ec.date_debut, partie_ec.date_fin)
+            )
+            
+            # Obtenir les horaires déjà pris par l'enseignant durant la période
+            dates_prises_enseignant = Horaire.objects.filter(
+                id_partie_ec__id_enseignant=enseignant.id,
+                date__range=(partie_ec.date_debut, partie_ec.date_fin)
+            )
+            
+            # Combiner les deux listes d'horaires
+            dates_prises = dates_prises_promotion.union(dates_prises_enseignant)
+            
+            # Sérialiser les données
+            serializer = Horaire_serial(dates_prises, many=True)
+            # Récupérer les dates prises et les informations de la partie EC, de l'EC , de l'UE et de la promotion, de la mention, de la filière et de la faculté
+            liste_horaire = []
+            for date_prise in serializer.data:
+                partie_ec = Partie_ec.objects.get(id=date_prise['id_partie_ec'])
+                ec = Elenent_Const.objects.get(id=partie_ec.id_ec.id)
+                ue = Unite_Ens.objects.get(id=ec.id_ue.id)
+                promotion = Promotion.objects.get(id=ue.id_promotion.id)
+                mention = Mention.objects.get(id=promotion.id_mention.id)
+                filiere = Filiere.objects.get(id=mention.id_fil.id)
+                faculte = Faculte.objects.get(id=filiere.id_fac.id)
+                
+                date_prise['partie_ec'] = Partie_ec_serial(partie_ec).data['partie_ec_choice']
+                date_prise['ec'] = Elenent_Const_serial(ec).data['denom_ec']
+                date_prise['ue'] = Unite_Ens_serial(ue).data['denom_ue']
+                date_prise['promotion'] = Promotion_serial(promotion).data['nom_prom']
+                date_prise['mention'] = Mention_serial(mention).data['nom_mention']
+                date_prise['filiere'] = Filiere_serial(filiere).data['nom_fil']
+                date_prise['faculte'] = Faculte_serial(faculte).data['nom_fac']
+                liste_horaire.append(date_prise)
+            
+            return Response(liste_horaire, status=status.HTTP_200_OK)
+        except Partie_ec.DoesNotExist:
+            return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Enseignant.DoesNotExist:
+            return Response({"message": "Enseignant not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Promotion.DoesNotExist:
+            return Response({"message": "Promotion not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 class Email_envoie(APIView):
     def post(self,request,id_partie_ec):
         """ This view help to create and account for testing sending mails."""
@@ -397,43 +451,4 @@ class Email_envoie(APIView):
         
 #DOCUMENTATION DE L'API     
 
-class Get_date_cours(APIView):
-    def get(self, request):
-        id_partie_ec = request.data.get('id_partie_ec')
-        if not id_partie_ec:
-            return Response({"message": "id_partie_ec is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            # Récupérer la partie EC
-            partie_ec = Partie_ec.objects.get(id=id_partie_ec)
-            serial_partiec = Partie_ec_serial(partie_ec)
-            enseignant = Enseignant.objects.get(id=serial_partiec.data['id_enseignant'])
-            
-            # Récupérer la promotion de la partie EC
-            promotion = Promotion.objects.get(id=partie_ec.id_ec.id_ue.id_promotion)
-            
-            # Obtenir les horaires déjà pris par la promotion durant la période
-            dates_prises_promotion = Horaire.objects.filter(
-                id_partie_ec__id_ec__id_ue__id_promotion=promotion,
-                date__range=(partie_ec.date_debut, partie_ec.date_fin)
-            )
-            
-            # Obtenir les horaires déjà pris par l'enseignant durant la période
-            dates_prises_enseignant = Horaire.objects.filter(
-                id_partie_ec__id_enseignant=enseignant,
-                date__range=(partie_ec.date_debut, partie_ec.date_fin)
-            )
-            
-            # Combiner les deux listes d'horaires
-            dates_prises = dates_prises_promotion.union(dates_prises_enseignant)
-            
-            # Sérialiser les données
-            serializer = Horaire_serial(dates_prises, many=True)
-            
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Partie_ec.DoesNotExist:
-            return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
-        except Enseignant.DoesNotExist:
-            return Response({"message": "Enseignant not found"}, status=status.HTTP_404_NOT_FOUND)
-        except Promotion.DoesNotExist:
             return Response({"message": "Promotion not found"}, status=status.HTTP_404_NOT_FOUND)
