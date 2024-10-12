@@ -66,28 +66,25 @@ class DomaineView(APIView):
 
 
 #faculte
-class FaculteView(APIView):
-    def get(self, request):
-        """
-           [
-                {
-                    "id": 1,
-                    "nom_fac": "Faculté des sciences",
-                    "id_dom": 1,
-                    "nom_dom": "Sciences et technologies",
-                    "nom_encadreur": "John Doe"
-                }
-            ]    
-        """
-        try:
-            # Dernier Anacad
-            dernier_anacad = Anacad.objects.latest('id')
-            serial_anacad = Anacad_serial(dernier_anacad)
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Faculte, Encadreur_faculte, Enseignant, MyUser
+from .serializers import Faculte_Serial, Encadreur_faculte_Serial, Enseignant_Serial, Utilisateur_Serial
 
-            # Récupération des facultés et des domaines en une seule requête
+class FaculteView(APIView):
+
+    # Récupération des facultés et des domaines
+    def get(self, request, *args, **kwargs):
+        try:
+            # Récupérer les facultés avec leurs domaines
             faculte = Faculte.objects.select_related('id_dom').all()
             liste_fac = []
-            print(f"FaculteView GET method: {faculte}")
+
+            # Précharger les encadreurs pour éviter des requêtes redondantes
+            encadreurs = Encadreur_faculte.objects.filter(id_faculte__in=faculte)
+            encadreurs_dict = {enc.id_faculte_id: enc for enc in encadreurs}
+
             for i in faculte:
                 data = {
                     'id': i.id,
@@ -96,35 +93,71 @@ class FaculteView(APIView):
                     'nom_dom': i.id_dom.nom_dom
                 }
 
-                try:
-                    # Recherche de l'encadreur pour la faculté
-                    encadreur = Encadreur_faculte.objects.get(id_faculte=i.id, id_anacad=serial_anacad.data['id'])
-                    serial_encadreur = Encadreur_faculte_Serial(encadreur).data
-                    enseignant = Enseignant.objects.get(id=serial_encadreur['id_ens'])
-                    serial_enseignant = Enseignant_Serial(enseignant).data
-                    user = MyUser.objects.get(id=serial_enseignant['id_user'])
-                    serial_user = Utilisateur_Serial(user).data
-                    data['nom_encadreur'] = serial_user['first_name'] + " " + serial_user['last_name']
-
-                except Encadreur_faculte.DoesNotExist:
-                    print(f"Encadreur_faculte does not exist for faculte_id: {i.id}")
-                    data['nom_encadreur'] = "Non assigné"
-
-                except Enseignant.DoesNotExist:
-                    print(f"Enseignant does not exist for encadreur_faculte_id: {i.id}")
-                    data['nom_encadreur'] = "Non assigné"
-
-                except MyUser.DoesNotExist:
-                    print(f"User does not exist for enseignant_id: {serial_enseignant['id_user']}")
+                # Recherche de l'encadreur pour la faculté
+                encadreur = encadreurs_dict.get(i.id)
+                if encadreur:
+                    try:
+                        enseignant = Enseignant.objects.get(id=encadreur.id_ens_id)
+                        user = MyUser.objects.get(id=enseignant.id_user_id)
+                        data['nom_encadreur'] = f"{user.first_name} {user.last_name}"
+                    except (Enseignant.DoesNotExist, MyUser.DoesNotExist):
+                        data['nom_encadreur'] = "Non assigné"
+                else:
                     data['nom_encadreur'] = "Non assigné"
 
                 liste_fac.append(data)
 
             return Response(liste_fac, status=status.HTTP_200_OK)
-        
+
         except Exception as e:
             print(f"Error in FaculteView GET method: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Ajouter une nouvelle faculté
+    def post(self, request, *args, **kwargs):
+        try:
+            # Sérialiser et valider les données
+            serial_data = Faculte_Serial(data=request.data)
+            if serial_data.is_valid():
+                serial_data.save()
+                return Response(serial_data.data, status=status.HTTP_201_CREATED)
+            return Response(serial_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            print(f"Error in FaculteView POST method: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Supprimer une faculté
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            faculte = Faculte.objects.get(pk=pk)
+            faculte.delete()
+            return Response({"message": "Faculté supprimée avec succès"}, status=status.HTTP_204_NO_CONTENT)
+
+        except Faculte.DoesNotExist:
+            return Response({"error": "Faculté non trouvée"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            print(f"Error in FaculteView DELETE method: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Mettre à jour une faculté
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            faculte = Faculte.objects.get(pk=pk)
+            serial_data = Faculte_Serial(faculte, data=request.data)
+            if serial_data.is_valid():
+                serial_data.save()
+                return Response(serial_data.data, status=status.HTTP_200_OK)
+            return Response(serial_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Faculte.DoesNotExist:
+            return Response({"error": "Faculté non trouvée"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            print(f"Error in FaculteView PUT method: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class FiliereView(APIView):
     def get(self,request):
         """ 
