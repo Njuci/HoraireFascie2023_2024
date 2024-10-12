@@ -54,7 +54,7 @@ class DomaineView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     def delete(self,request):
-        """ 
+        """ z
         pour supprimer un domaine
         {"id":1}
         """
@@ -64,27 +64,21 @@ class DomaineView(APIView):
             return Response({"messafe":"domaine supprimé"},status=status.HTTP_204_NO_CONTENT)
         return Response({"message":"domaine non supprimé"},status=status.HTTP_400_BAD_REQUEST)
 
-
 #faculte
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Faculte, Encadreur_faculte, Enseignant, MyUser
-from .serializers import Faculte_Serial, Encadreur_faculte_Serial, Enseignant_Serial, Utilisateur_Serial
-
 class FaculteView(APIView):
-
-    # Récupération des facultés et des domaines
     def get(self, request, *args, **kwargs):
         try:
+            # Récupérer la dernière année académique
+            derniere_anacad = Anacad.objects.latest('id')
+            
             # Récupérer les facultés avec leurs domaines
             faculte = Faculte.objects.select_related('id_dom').all()
             liste_fac = []
 
-            # Précharger les encadreurs pour éviter des requêtes redondantes
-            encadreurs = Encadreur_faculte.objects.filter(id_faculte__in=faculte)
+            # Précharger les encadreurs pour la dernière année académique
+            encadreurs = Encadreur_faculte.objects.filter(id_faculte__in=faculte, id_anacad=derniere_anacad).select_related('id_ens__id_user')
             encadreurs_dict = {enc.id_faculte_id: enc for enc in encadreurs}
-
+            
             for i in faculte:
                 data = {
                     'id': i.id,
@@ -97,8 +91,8 @@ class FaculteView(APIView):
                 encadreur = encadreurs_dict.get(i.id)
                 if encadreur:
                     try:
-                        enseignant = Enseignant.objects.get(id=encadreur.id_ens_id)
-                        user = MyUser.objects.get(id=enseignant.id_user_id)
+                        enseignant = encadreur.id_ens
+                        user = enseignant.id_user
                         data['nom_encadreur'] = f"{user.first_name} {user.last_name}"
                     except (Enseignant.DoesNotExist, MyUser.DoesNotExist):
                         data['nom_encadreur'] = "Non assigné"
@@ -109,6 +103,8 @@ class FaculteView(APIView):
 
             return Response(liste_fac, status=status.HTTP_200_OK)
 
+        except Anacad.DoesNotExist:
+            return Response({"message": "Aucune année académique trouvée"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(f"Error in FaculteView GET method: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -117,7 +113,7 @@ class FaculteView(APIView):
     def post(self, request, *args, **kwargs):
         try:
             # Sérialiser et valider les données
-            serial_data = Faculte_Serial(data=request.data)
+            serial_data = Faculte_serial(data=request.data)
             if serial_data.is_valid():
                 serial_data.save()
                 return Response(serial_data.data, status=status.HTTP_201_CREATED)
@@ -145,7 +141,7 @@ class FaculteView(APIView):
     def put(self, request, pk):
         try:
             faculte = Faculte.objects.get(pk=pk)
-            serial_data = Faculte_Serial(faculte, data=request.data)
+            serial_data = Faculte_serial(faculte, data=request.data)
             if serial_data.is_valid():
                 serial_data.save()
                 return Response(serial_data.data, status=status.HTTP_200_OK)
