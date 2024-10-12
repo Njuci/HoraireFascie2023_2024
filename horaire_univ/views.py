@@ -128,9 +128,9 @@ class FaculteView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Supprimer une faculté
-    def delete(self, request, pk, *args, **kwargs):
+    def delete(self, request, id):
         try:
-            faculte = Faculte.objects.get(pk=pk)
+            faculte = Faculte.objects.get(pk=id)
             faculte.delete()
             return Response({"message": "Faculté supprimée avec succès"}, status=status.HTTP_204_NO_CONTENT)
 
@@ -142,7 +142,7 @@ class FaculteView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Mettre à jour une faculté
-    def put(self, request, pk, *args, **kwargs):
+    def put(self, request, pk):
         try:
             faculte = Faculte.objects.get(pk=pk)
             serial_data = Faculte_Serial(faculte, data=request.data)
