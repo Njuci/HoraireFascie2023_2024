@@ -104,7 +104,7 @@ DATABASES = {
         'PORT': env('DB_PORT', default='3306'),
     }
 }
-CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000',]
+CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000','https://hora-app.vercel.app/']
 
 """
 
