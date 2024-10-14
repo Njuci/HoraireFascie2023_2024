@@ -756,6 +756,7 @@ class Get_Partie_ecByEcAnacad(APIView):
                 "id_promotion": 1,
                 "nom_prom": "Bac 1",
                 "nom_ue": "Initiation à la programmation"
+                
             }
         ]
         """

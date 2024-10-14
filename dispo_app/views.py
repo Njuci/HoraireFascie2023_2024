@@ -453,4 +453,45 @@ class Email_envoie(APIView):
         
 #DOCUMENTATION DE L'API     
 
+
+
             return Response({"message": "Promotion not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        
+        
+        
+        
+class GetHorairebyPromo(APIView):
+    def get(self, request, id_promotion, id_anacad):
+        try:
+            # Récupérer les parties EC de la promotion
+            parties_ec = Partie_ec.objects.filter(
+                id_ec__id_ue__id_promotion=id_promotion,
+                id_anacad=id_anacad
+            ).select_related('id_enseignant__id_user', 'id_ec__id_ue__id_promotion__id_mention__id_fil__id_fac')
+            
+            # Récupérer les horaires de chaque partie EC
+            liste_horaire = []
+            for partie_ec in parties_ec:
+                nom_enseignant = f"{partie_ec.id_enseignant.id_user.first_name} {partie_ec.id_enseignant.id_user.last_name}"
+                horaires = Horaire.objects.filter(id_partie_ec=partie_ec.id)
+                for h in horaires:
+                    horaire = {
+                        'date': h.date,
+                        'partie_journ': h.partie_journ,
+                        'partie_ec': partie_ec.partie_ec_choice,
+                        'ec': partie_ec.id_ec.denom_ec,
+                        'ue': partie_ec.id_ec.id_ue.denom_ue,
+                        'promotion': partie_ec.id_ec.id_ue.id_promotion.nom_prom,
+                        'mention': partie_ec.id_ec.id_ue.id_promotion.id_mention.nom_mention,
+                        'filiere': partie_ec.id_ec.id_ue.id_promotion.id_mention.id_fil.nom_fil,
+                        'faculte': partie_ec.id_ec.id_ue.id_promotion.id_mention.id_fil.id_fac.nom_fac,
+                        'nom_enseignant': nom_enseignant
+                    }
+                    liste_horaire.append(horaire)
+            
+            # Sérialiser les données
+            return Response(liste_horaire, status=status.HTTP_200_OK)
+        except Partie_ec.DoesNotExist:
+            return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
