@@ -531,6 +531,8 @@ class GetHorairebyEnseignant(APIView):
             
             # Sérialiser les données
             return Response(liste_horaire, status=status.HTTP_200_OK)
+        except Anacad.DoesNotExist:
+            return Response({"message": "Anacad not found"}, status=status.HTTP_404_NOT_FOUND)
         except Partie_ec.DoesNotExist:
             return Response({"message": "Partie EC not found"}, status=status.HTTP_404_NOT_FOUND)
         except Enseignant.DoesNotExist:
