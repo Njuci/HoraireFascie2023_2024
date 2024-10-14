@@ -498,9 +498,8 @@ class GetHorairebyPromo(APIView):
         
         
 # get horaire by enseignant par anacad
-
 class GetHorairebyEnseignant(APIView):
-    def get(request,id_enseignant,id_anacad):
+    def get(self, request, id_enseignant, id_anacad):  # Ajout de self
         try:
             # Récupérer les parties EC de la promotion
             parties_ec = Partie_ec.objects.filter(
