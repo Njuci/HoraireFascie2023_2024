@@ -33,16 +33,19 @@ class DisponibiliteView(APIView):
         # Affichage des données envoyées
         print(request.data)
 
-        # Conversion de la chaîne 'liste_jours' en une liste de dictionnaires
-        chaine = request.data['liste_jours']
-        chaine_modifiee = '[' + chaine + ']'  # Ajout des crochets pour une liste valide
-        liste_jours = json.loads(chaine_modifiee)  # Conversion en liste de dictionnaires
+        # Assurez-vous que 'liste_jours' est bien une liste
+        liste_jours = request.data.get('liste_jours')
+        
+        if not isinstance(liste_jours, list):
+            return Response({"error": "'liste_jours' doit être une liste."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Affichage du résultat pour vérification
         print(liste_jours)
-
+        print(str(liste_jours))
         # Créer une nouvelle instance de Disponibilite
-        serial_dispo = Disponibilite_serial(data=request.data)
+        data={"id_partie_ec":request.data['id_partie_ec'],'liste_jours':str(liste_jours)}
+        
+        serial_dispo = Disponibilite_serial(data=data)
         if serial_dispo.is_valid(raise_exception=True):
             serial_dispo.save()
 
@@ -65,8 +68,7 @@ class DisponibiliteView(APIView):
             return Response({"message": "Disponibilité et horaires créés avec succès."}, status=status.HTTP_201_CREATED)
 
         else:
-            return Response(serial_dispo.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+            return Response(serial_dispo.errors, status=status.HTTP_400_BAD_REQUEST)        
              
         
     def put(self,request):

@@ -99,7 +99,7 @@ DATABASES = {
         'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
         'NAME': 'horaire_ucb',
         'USER': env('DB_USER', default='njuci'),
-        'PASSWORD': '3670njci',
+        'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST', default='localhost'),
         'PORT': env('DB_PORT', default='3306'),
     }

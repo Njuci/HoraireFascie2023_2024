@@ -4,7 +4,7 @@ from horaire_univ.models import *
 # Create your models here.
 
 class Disponibilite(models.Model):
-    id_partie_ec=models.ForeignKey(Partie_ec,on_delete=models.CASCADE)
+    id_partie_ec=models.OneToOneField(Partie_ec,on_delete=models.CASCADE)
     liste_jours=models.TextField()
      
     def set_nombres(self, liste):
