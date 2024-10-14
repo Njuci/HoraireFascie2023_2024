@@ -502,9 +502,11 @@ class GetHorairebyEnseignant(APIView):
     def get(self, request, id_enseignant, id_anacad):  # Ajout de self
         try:
             # Récupérer les parties EC de la promotion
+            anacad = Anacad.objects.filter(denom_anacad=id_anacad).first()
+            
             parties_ec = Partie_ec.objects.filter(
                 id_enseignant=id_enseignant,
-                id_anacad=id_anacad
+                id_anacad=anacad.id
             ).select_related('id_enseignant__id_user', 'id_ec__id_ue__id_promotion__id_mention__id_fil__id_fac')
             
             # Récupérer les horaires de chaque partie EC
