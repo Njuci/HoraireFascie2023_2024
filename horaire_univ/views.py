@@ -761,7 +761,6 @@ class Get_Partie_ecByEcAnacad(APIView):
         """
         # 
         partie_ec = Partie_ec.objects.filter(id_ec=id_ec, id_anacad=id_anacad)
-        # Sérialiser les données
         serializer = Partie_ec_serial(partie_ec, many=True)
         
         # Ajouter les informations de l'EC, de l'UE et de la promotion
@@ -774,6 +773,10 @@ class Get_Partie_ecByEcAnacad(APIView):
             partie['niveau_ec'] = ec.niveau_ec
             partie['id_ue'] = ue.id
             partie['nom_ue'] = ue.denom_ue
+            #nom de l4enseignant
+            enseignant=Enseignant.objects.get(id=partie['id_enseignant'])
+            user=MyUser.objects.get(id=enseignant.id_user_id)
+            partie['nom_enseignant']=f"{user.first_name} {user.last_name}"
 
             
             liste_partie_ec.append(partie)
