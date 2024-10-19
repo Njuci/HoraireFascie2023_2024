@@ -12,18 +12,24 @@ class MaListe(models.Model):
 
 class Domaine(models.Model):
     nom_dom=models.CharField(max_length=70,blank=True,unique=True)
-
+    def __str__(self) -> str:
+        return self.nom_dom
 class Faculte(models.Model):
     id_dom=models.ForeignKey(Domaine,on_delete=models.CASCADE)
     nom_fac=models.CharField(max_length=70,blank=True,unique=True)
+    def __str__(self) -> str:
+        return f'{self.nom_fac} {self.id_dom.nom_dom}' 
 
 class Filiere(models.Model):
     id_fac=models.ForeignKey(Faculte,on_delete=models.CASCADE)
     nom_fil=models.CharField(max_length=70,unique=True,blank=True)
-
+    def __str__(self) -> str:
+        return f"{self.nom_fil} {self.id_fac.nom_fac} {self.id_fac.id_dom.nom_dom}"
 class Mention(models.Model):
     id_fil=models.ForeignKey(Filiere,on_delete=models.CASCADE)
     nom_mention=models.CharField(max_length=70,unique=True,blank=True)
+    def __str__(self) -> str:
+        return f"{self.nom_mention} {self.id_fil.nom_fil} {self.id_fil.id_fac.nom_fac} {self.id_fil.id_fac.id_dom.nom_dom}"
 
 class Promotion(models.Model):
     id_mention=models.ForeignKey(Mention,on_delete=models.CASCADE)

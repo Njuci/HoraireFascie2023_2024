@@ -93,6 +93,23 @@ WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 
 
 # Database configuration
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'horadb',
+        'USER': 'horadb_owner',
+        'PASSWORD': 'zOEQdT16hpyF',
+        'HOST': 'ep-flat-star-a537v3dt.us-east-2.aws.neon.tech',
+        'PORT': '5432',  # Par défaut, PostgreSQL utilise le port 5432
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    }
+}
+CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000','https://hora-app.vercel.app/']
+
+"""
+
 
 DATABASES = {
     'default': {
@@ -104,9 +121,6 @@ DATABASES = {
         'PORT': env('DB_PORT', default='3306'),
     }
 }
-CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000','https://hora-app.vercel.app/']
-
-"""
 
 DATABASES = {
     'default': {
