@@ -91,6 +91,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'HoraireFascie2023_2024.wsgi.application'
 #Database configuration with postgresql
 
+DATABASES = {
+    'default': {
+        'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
+    }
+}
+
+
+CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000','https://hora-app.vercel.app/']
+
+"""
 
 # Database configuration
 DATABASES = {
@@ -104,21 +119,6 @@ DATABASES = {
         'OPTIONS': {
             'sslmode': 'require',
         },
-    }
-}
-CSRF_TRUSTED_ORIGINS = ['https://34.45.123.91', 'http://localhost:3000','https://hora-app.vercel.app/']
-
-"""
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': env('DB_ENGINE', default='django.db.backends.mysql'),
-        'NAME': 'horaire_ucb',
-        'USER': env('DB_USER', default='njuci'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST', default='34.45.123.91'),
-        'PORT': env('DB_PORT', default='3306'),
     }
 }
 
